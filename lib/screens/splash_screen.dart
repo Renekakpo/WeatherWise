@@ -1,7 +1,58 @@
 import 'package:flutter/material.dart';
 
-class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key});
+import '../helpers/PermissionHelper.dart';
+import 'home_screen.dart';
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkAndRequestPermission();
+  }
+
+  Future<void> _checkAndRequestPermission() async {
+    bool permissionGranted =
+        await PermissionHelper().requestLocationPermission();
+    if (!permissionGranted) {
+      // Handle the case when permission is not granted
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Location Permission Required'),
+            content: Text(
+                'Please grant location permission to continue using the app.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Permission granted, proceed to the next screen
+      _navigateToNextScreen();
+    }
+  }
+
+  void _navigateToNextScreen() {
+    // Navigate to the next screen, for example, HomeScreen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+          builder: (context) => const HomeScreen(title: "Vancouver, Canada")),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

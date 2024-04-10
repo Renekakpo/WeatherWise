@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weatherwise/screens/home_screen.dart';
+import 'package:weatherwise/screens/splash_screen.dart';
 
 import 'helpers/shared_preferences_helper.dart';
 
@@ -8,6 +8,18 @@ void main() async {
 
   // Initialize AppSharedPreferences
   await AppSharedPreferences().init();
+
+  /*// Check and request location permission
+  final PermissionHelper permissionHelper = PermissionHelper();
+  final bool isLocationPermissionGranted = await permissionHelper.isLocationPermissionGranted();
+
+  if (!isLocationPermissionGranted) {
+    final bool permissionGranted = await permissionHelper.requestLocationPermission();
+    if (!permissionGranted) {
+      // Permission denied, close the app
+      return;
+    }
+  }*/
 
   runApp(const MyApp());
 }
@@ -19,12 +31,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'OpenSans',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-        useMaterial3: true,
-      ),
-      home: const SafeArea(child: HomeScreen(title: "Vancouver, Canada"),),
-    );
+        theme: ThemeData(
+          fontFamily: 'OpenSans',
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+          useMaterial3: true,
+        ),
+        home: const SafeArea(child: SplashScreen())
+        // home: const SafeArea(child: HomeScreen(title: "Vancouver, Canada"),),
+        );
   }
 }
