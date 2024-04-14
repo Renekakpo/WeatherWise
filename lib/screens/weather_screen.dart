@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
+import 'package:weatherwise/models/forecast_data.dart';
+import 'package:weatherwise/models/weather_data.dart';
 import 'package:weatherwise/widgets/forecast_tips_card.dart';
 
-import '../helpers/WeatherApiHelper.dart';
-import '../helpers/fake_data.dart';
-import '../helpers/utils_helper.dart';
 import '../widgets/forecast_card.dart';
 import '../widgets/forecast_data_item.dart';
 import '../widgets/weather_details_view.dart';
 
 class WeatherScreen extends StatefulWidget {
-  const WeatherScreen({super.key});
+  final WeatherData weatherData;
+  final ForecastData forecastData;
+
+  const WeatherScreen(
+      {super.key, required this.weatherData, required this.forecastData});
 
   @override
   State<WeatherScreen> createState() => _WeatherScreenState();
@@ -19,28 +21,6 @@ class WeatherScreen extends StatefulWidget {
 
 class _WeatherScreenState extends State<WeatherScreen> {
   var backgroundColor = Colors.blueGrey;
-
-  final WeatherApiHelper weatherApiHelper = WeatherApiHelper(openWeatherApiKey);
-
-  @override
-  void initState() {
-    super.initState();
-    // Call the method to fetch weather data
-    _fetchWeatherData();
-  }
-
-  Future<void> _fetchWeatherData() async {
-    try {
-      // Example: Fetch weather data for a specific location
-      Map<String, dynamic> weatherData =
-          await weatherApiHelper.getCurrentWeather(37.7749, -122.4194);
-      // Handle the weather data as needed
-      print(weatherData);
-    } catch (e) {
-      // Handle errors
-      print("Error fetching weather data: $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,20 +32,20 @@ class _WeatherScreenState extends State<WeatherScreen> {
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
-          _buildCurrentForecast(context),
-          _buildWeatherData(context),
+          _buildMainWeather(context, widget.weatherData),
+          _buildMainWeatherForecast(context, getCurrentDateForecast(widget.forecastData.list)),
           const ForecastTipsCard(),
-          const ForecastCard(),
-          const WeatherDetailsView()
+          ForecastCard(forecastItems: groupByDt(widget.forecastData.list)),
+          WeatherDetailsView(weatherData: widget.weatherData)
         ],
       ),
     ));
   }
 }
 
-Widget _buildCurrentForecast(BuildContext context) {
+Widget _buildMainWeather(
+    BuildContext context, WeatherData weatherData) {
   double mSize = MediaQuery.of(context).size.width;
-  int temp = 32;
 
   return Container(
     width: mSize,
@@ -92,21 +72,21 @@ Widget _buildCurrentForecast(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "$tempº",
+              "${weatherData.main.temp.round()}",
               style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 60.0,
                   fontWeight: FontWeight.w500),
             ),
-            const Text(
-              "Haze",
-              style: TextStyle(
+            Text(
+              weatherData.weather.first.main,
+              style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 17.0,
                   fontWeight: FontWeight.w500),
             ),
             Text(
-              "${temp + 10}º / ${temp - 10}º Feels like ${temp + 8}º",
+              "${weatherData.main.tempMax.round()}º / ${weatherData.main.tempMin.round()}º Feels like ${weatherData.main.feelsLike.round()}º",
               style: const TextStyle(
                   color: Colors.black87,
                   fontSize: 12.0,
@@ -118,16 +98,14 @@ Widget _buildCurrentForecast(BuildContext context) {
           width: mSize * 0.1,
         ),
         Expanded(
-            child: Lottie.asset("assets/icons/rain-night.json",
+            child: Lottie.asset("assets/icons/${weatherData.weather.first.main.toLowerCase().replaceAll(" ", "-")}.json",
                 width: mSize * 0.4, height: mSize * 0.4))
       ],
     ),
   );
 }
 
-Widget _buildWeatherData(BuildContext context) {
-  final forecastData = generateDummyData();
-
+Widget _buildMainWeatherForecast(BuildContext context, List<ForecastItem> currentForecastItems) {
   return Container(
     width: double.infinity,
     margin:
@@ -152,8 +130,9 @@ Widget _buildWeatherData(BuildContext context) {
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
           style: TextStyle(
-              color: Colors.black87,
-              fontSize: 14.0,),
+            color: Colors.black87,
+            fontSize: 14.0,
+          ),
         ),
         const Divider(
           color: Colors.black54,
@@ -163,9 +142,9 @@ Widget _buildWeatherData(BuildContext context) {
             height: MediaQuery.of(context).size.width / 3,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: forecastData.length,
+              itemCount: currentForecastItems.length,
               itemBuilder: (context, index) {
-                return ForecastDataItem(data: forecastData[index]);
+                return ForecastDataItem(data: currentForecastItems[index]);
               },
             ))
       ],

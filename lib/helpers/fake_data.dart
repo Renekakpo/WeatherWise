@@ -1,6 +1,3 @@
-import 'dart:math';
-
-import '../models/forecast_data.dart';
 import '../models/forecast_weather_data.dart';
 import '../models/manage_location.dart';
 
@@ -175,15 +172,3 @@ String _getDayName(int weekday) {
       return '';
   }
 }
-
-// Generate random forecast data for each day
-List<ForecastData> forecastList = List.generate(8, (index) {
-  return ForecastData(
-    day: days[index],
-    minTemp: Random().nextInt(20) + 10.toDouble(),
-    maxTemp: Random().nextInt(20) + 20.toDouble(),
-    weatherTypeForMinTemp: 'Sunny',
-    weatherTypeForMaxTemp: 'Cloudy',
-    raindropProb: Random().nextDouble() * 100,
-  );
-});

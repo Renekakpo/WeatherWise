@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:weatherwise/models/forecast_data.dart';
 
-import '../helpers/fake_data.dart';
 import '../helpers/utils_helper.dart';
 
 class ForecastCard extends StatefulWidget {
 
-  const ForecastCard({super.key});
+  final List<ForecastItem> forecastItems;
+
+  const ForecastCard({super.key, required this.forecastItems});
 
   @override
   State<ForecastCard> createState() => _ForecastCardState();
@@ -37,17 +38,17 @@ class _ForecastCardState extends State<ForecastCard> {
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.width * 0.57,
           child: ListView.builder(
-            itemCount: forecastList.length,
+            itemCount: widget.forecastItems.length,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              return _buildForecastItem(index, data: forecastList[index]);
+              return _buildForecastItem(index, widget.forecastItems[index]);
             },
           )),
     );
   }
 }
 
-Widget _buildForecastItem(int index, {required ForecastData data}) {
+Widget _buildForecastItem(int index, ForecastItem forecastItem) {
   var itemColor = (index == 0) ? Colors.grey : Colors.black;
 
   return Container(
@@ -55,7 +56,7 @@ Widget _buildForecastItem(int index, {required ForecastData data}) {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(data.day,
+        Text(getDayNameFromTimestamp(forecastItem.dt),
             style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w700,
@@ -68,23 +69,23 @@ Widget _buildForecastItem(int index, {required ForecastData data}) {
         ),
         const SizedBox(width: 3.0,),
         Text(
-          '${data.raindropProb.toStringAsFixed(0)}% ',
+          '${(forecastItem.pop * 100).toStringAsFixed(0)}%',
           style: TextStyle(
               fontSize: 13.0, fontWeight: FontWeight.w400, color: itemColor),
         ),
         const SizedBox(width: 15.0,),
-        Icon(iconDataFromWeatherType(data.weatherTypeForMaxTemp), color: itemColor,),
+        Icon(iconDataFromWeatherType(forecastItem.weather.first.main.toLowerCase()), color: itemColor,),
         const SizedBox(width: 15.0,),
-        Icon(iconDataFromWeatherType(data.weatherTypeForMinTemp), color: itemColor,),
+        Icon(iconDataFromWeatherType(forecastItem.weather.first.main.toLowerCase()), color: itemColor,),
         const SizedBox(width: 15.0),
         Text(
-          '${data.maxTemp.round()}º ',
+          '${forecastItem.main.tempMax.round()}º ',
           style: TextStyle(
               fontSize: 16.0, fontWeight: FontWeight.w700, color: itemColor),
         ),
         const SizedBox(width: 15.0,),
         Text(
-          '${data.minTemp.round()}º',
+          '${forecastItem.main.tempMin.round()}º',
           style: TextStyle(
               fontSize: 16.0, fontWeight: FontWeight.w700, color: itemColor),
         ),

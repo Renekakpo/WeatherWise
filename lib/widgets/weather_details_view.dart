@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:weatherwise/models/weather_data.dart';
+import 'package:weatherwise/utils/strings.dart';
 
 class WeatherDetailsView extends StatelessWidget {
+  final WeatherData weatherData;
 
-  const WeatherDetailsView({super.key});
+  const WeatherDetailsView({super.key, required this.weatherData});
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +37,9 @@ class WeatherDetailsView extends StatelessWidget {
         child: Column(children: [
           Row(
             children: [
-              _buildWeatherTempItem(mWidth, headerFont, subHeaderFont),
+              _buildWeatherTempItem(weatherData.main.temp.toInt(), mWidth, headerFont, subHeaderFont),
               const Expanded(child: SizedBox()),
-              _buildWeatherWindItem(mWidth, headerFont, subHeaderFont)
+              _buildWeatherWindItem((weatherData.wind.speed*3.6).toInt(), mWidth, headerFont, subHeaderFont)
             ],
           ),
           const SizedBox(
@@ -44,16 +47,15 @@ class WeatherDetailsView extends StatelessWidget {
           ),
           Row(
             children: [
-              _buildWeatherUVIndexItem(mWidth, headerFont, subHeaderFont),
+              _buildWeatherUVIndexItem(weatherData.main.pressure, mWidth, headerFont, subHeaderFont),
               const Expanded(child: SizedBox()),
-              _buildWeatherHumidityItem(mWidth, headerFont, subHeaderFont)
+              _buildWeatherHumidityItem(weatherData.main.humidity, mWidth, headerFont, subHeaderFont)
             ],
           )
         ]));
   }
 
-  Widget _buildWeatherTempItem(
-      double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
+  Widget _buildWeatherTempItem(int temp, double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
       height: mWidth * 0.2,
@@ -73,8 +75,8 @@ class WeatherDetailsView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("72º", style: headerFont),
-              Text("Celsius", style: subHeaderFont)
+              Text("$tempº", style: headerFont),
+              Text(Strings.celsius, style: subHeaderFont)
             ],
           )
         ],
@@ -82,7 +84,7 @@ class WeatherDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherWindItem(
+  Widget _buildWeatherWindItem(int windSpeed,
       double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
@@ -102,7 +104,7 @@ class WeatherDetailsView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("134 km/h", style: headerFont),
+              Text("$windSpeed km/h", style: headerFont),
               Text("Wind", style: subHeaderFont)
             ],
           )
@@ -111,7 +113,7 @@ class WeatherDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherUVIndexItem(
+  Widget _buildWeatherUVIndexItem(int pressure,
       double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
@@ -125,14 +127,14 @@ class WeatherDetailsView extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Lottie.asset("assets/icons/sunny.json",
+          Lottie.asset("assets/icons/pressure-low.json",
               width: mWidth * 0.2, height: mWidth * 0.2),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("0.2", style: headerFont),
-              Text("UV Index", style: subHeaderFont)
+              Text("$pressure", style: headerFont),
+              Text("Pressure", style: subHeaderFont)
             ],
           )
         ],
@@ -140,7 +142,7 @@ class WeatherDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherHumidityItem(
+  Widget _buildWeatherHumidityItem(int humidity,
       double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
@@ -160,7 +162,7 @@ class WeatherDetailsView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("48%", style: headerFont),
+              Text("$humidity%", style: headerFont),
               Text("Humidity", style: subHeaderFont)
             ],
           )

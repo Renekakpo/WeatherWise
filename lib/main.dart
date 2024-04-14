@@ -9,18 +9,6 @@ void main() async {
   // Initialize AppSharedPreferences
   await AppSharedPreferences().init();
 
-  /*// Check and request location permission
-  final PermissionHelper permissionHelper = PermissionHelper();
-  final bool isLocationPermissionGranted = await permissionHelper.isLocationPermissionGranted();
-
-  if (!isLocationPermissionGranted) {
-    final bool permissionGranted = await permissionHelper.requestLocationPermission();
-    if (!permissionGranted) {
-      // Permission denied, close the app
-      return;
-    }
-  }*/
-
   runApp(const MyApp());
 }
 

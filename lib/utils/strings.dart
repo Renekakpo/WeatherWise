@@ -24,4 +24,7 @@ class Strings {
   static const String appNotificationsLabel = "Notifications";
   static const String appShareLabel = "Share";
   static const String appAboutLabel = "About";
+  static const String favouriteLocationDesc =
+      "Your favourite location will be used to provide weather information in notifications and other connected services. You can change your favorite location in your location list.";
+  static const String celsius = "Celsius";
 }

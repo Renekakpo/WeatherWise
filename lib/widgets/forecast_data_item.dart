@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:weatherwise/models/forecast_weather_data.dart';
+
+import '../helpers/utils_helper.dart';
+import '../models/forecast_data.dart';
 
 class ForecastDataItem extends StatelessWidget {
-  final ForecastWeatherData data;
+  final ForecastItem data;
   const ForecastDataItem({super.key, required this.data});
 
   @override
@@ -15,19 +17,18 @@ class ForecastDataItem extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text('${data.hour.round()}AM', style: textStyle,),
+          Text(formatTimestampToHour(data.dt), style: textStyle,),
           const SizedBox(height: 10.0,),
           Lottie.asset("assets/icons/overcast-rain.json", width: 25.0, height: 25.0),
           // Icon(iconDataFromWeatherType(data.weatherType), color: Colors.white,),
           const SizedBox(height: 10.0,),
-          Text('${data.temperature.round()}º', style: textStyle),
+          Text('${data.main.temp.round()}º', style: textStyle),
           const SizedBox(height: 10.0,),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon(iconDataFromWeatherType(""), color: Colors.white),
               Lottie.asset("assets/icons/raindrop.json", width: 25.0, height: 25.0),
-              Text('${data.raindropProb.round()}%', style: textStyle),
+              Text('${(data.pop * 100).toStringAsFixed(0)}%', style: textStyle),
             ],
           ),
         ],

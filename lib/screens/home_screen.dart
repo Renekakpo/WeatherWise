@@ -1,40 +1,109 @@
+import 'dart:async';
+
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:weatherwise/helpers/LocationHelper.dart';
+import 'package:weatherwise/models/forecast_data.dart';
+import 'package:weatherwise/network/WeatherApiHelper.dart';
 import 'package:weatherwise/screens/manage_locations_screen.dart';
 import 'package:weatherwise/screens/report_wrong_location.dart';
 import 'package:weatherwise/screens/settings_screen.dart';
 import 'package:weatherwise/screens/weather_screen.dart';
+import 'package:weatherwise/utils/strings.dart';
+
+import '../helpers/utils_helper.dart';
+import '../models/weather_data.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String title;
-
-  const HomeScreen({super.key, required this.title});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final int _selectedIndex = 0;
-  static const TextStyle optionStyle = TextStyle(
-      fontSize: 30, fontFamily: "Roboto", fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Business',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
-  ];
-  final String favouriteLocationDesc =
-      "Your favourite location will be used to provide weather information in notifications and other connected services. You can change your favorite location in your location list.";
+  final WeatherApiHelper weatherApiHelper = WeatherApiHelper(API_KEY);
+  late Position _currentPosition;
+  WeatherData? _weatherData;
+  ForecastData? _forecastData;
+  bool _locationEnabled = false;
+  late StreamSubscription<ServiceStatus> _serviceSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocationAndWeatherData();
+
+    _serviceSubscription = Geolocator.getServiceStatusStream().listen((event) {
+      if (event == ServiceStatus.enabled) {
+        _getCurrentLocationAndWeatherData();
+      } else {
+        _locationEnabled = (event == ServiceStatus.enabled);
+        _showExplanationDialogForLocationService();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _serviceSubscription.cancel();
+  }
+
+  Future<void> _getCurrentLocationAndWeatherData() async {
+    // Check if location service is enable
+    _locationEnabled = await LocationHelper().isLocationServiceEnabled();
+    if (_locationEnabled) {
+      // Get current location
+      _currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      _getWeatherData();
+      _getForecastData();
+    } else {
+      _showExplanationDialogForLocationService();
+    }
+  }
+
+  void _showExplanationDialogForLocationService() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Service'),
+          content: const Text(
+              'Please enable location service to access the weather info.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _getWeatherData() async {
+    // Request weather data for current location
+    weatherApiHelper
+        .getCurrentWeatherData(
+            _currentPosition.latitude, _currentPosition.longitude)
+        .then((data) => setState(() {
+              _weatherData = data;
+            }));
+  }
+
+  Future<void> _getForecastData() async {
+    // Request weather data for current location
+    weatherApiHelper
+        .getForecastData(_currentPosition.latitude, _currentPosition.longitude)
+        .then((data) => setState(() {
+              _forecastData = data;
+            }));
+  }
 
   void _settingIconPressed() {
     _closeDrawer();
@@ -85,23 +154,29 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
           backgroundColor: const Color(0xFFF8FAFD),
           iconTheme: const IconThemeData(color: Colors.black54),
-          title: _buildAppBarTitle()),
-      body: const WeatherScreen(),
+          title: _buildAppBarTitle(
+              _locationEnabled, _weatherData?.name ?? "-")),
+      body: (_weatherData == null || _forecastData == null)
+          ? Container()
+          : WeatherScreen(
+              weatherData: _weatherData!, forecastData: _forecastData!),
       drawer: _buildDrawerContainer(),
     );
   }
 
-  Widget _buildAppBarTitle() {
+  Widget _buildAppBarTitle(bool locationEnabled, String locationName) {
     return Container(
         padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.location_on_outlined, color: Colors.black),
+            locationEnabled
+                ? const Icon(Icons.location_on_outlined, color: Colors.black)
+                : const Icon(Icons.location_off_outlined, color: Colors.black),
             const SizedBox(width: 15.0),
             Expanded(
                 child: Text(
-              widget.title,
+              locationName,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                   color: Colors.black, fontWeight: FontWeight.w600),
@@ -190,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Tooltip(
           margin: const EdgeInsets.symmetric(horizontal: 25.0),
           height: MediaQuery.of(context).size.width / 4,
-          message: favouriteLocationDesc,
+          message: Strings.favouriteLocationDesc,
           textAlign: TextAlign.start,
           triggerMode: TooltipTriggerMode.tap,
           showDuration: const Duration(milliseconds: 3000),

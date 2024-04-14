@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:permission_handler/permission_handler.dart';
+
 import 'package:flutter/material.dart';
 
 import '../helpers/PermissionHelper.dart';
@@ -10,47 +13,88 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver {
+  StreamSubscription<PermissionStatus>? _permissionStatusSubscription;
+  bool _openedAppSettings = false;
+
   @override
   void initState() {
     super.initState();
-    _checkAndRequestPermission();
+    _checkPermissions();
+    // Subscribe to permission status changes
+    _permissionStatusSubscription =
+        PermissionHelper().permissionStatusStream.listen((status) {
+          if (status.isGranted) {
+            _navigateToNextScreen();
+          } else if (status.isDenied || status.isPermanentlyDenied) {
+            _handleLocationPermissionDenied();
+          }
+        });
+
+    WidgetsBinding.instance.addObserver(this);
   }
 
-  Future<void> _checkAndRequestPermission() async {
-    bool permissionGranted =
-        await PermissionHelper().requestLocationPermission();
-    if (!permissionGranted) {
-      // Handle the case when permission is not granted
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Location Permission Required'),
-            content: Text(
-                'Please grant location permission to continue using the app.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+  @override
+  void dispose() {
+    // Cancel the permission status subscription
+    _permissionStatusSubscription?.cancel();
+    PermissionHelper().dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && _openedAppSettings) {
+      _openedAppSettings = false;
+      _checkPermissions();
+    }
+  }
+
+  Future<void> _checkPermissions() async {
+    if (!await PermissionHelper().isLocationPermissionGranted()) {
+      PermissionHelper().requestLocationPermission();
     } else {
-      // Permission granted, proceed to the next screen
       _navigateToNextScreen();
     }
+  }
+
+  void _handleLocationPermissionDenied() async {
+    if (await PermissionHelper().shouldShowLocationRequestRationale()) {
+      _showExplanationDialog();
+    } else { // Permission permanently denied
+      _openedAppSettings = true;
+      PermissionHelper().openSettings();
+    }
+  }
+
+  void _showExplanationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Permission Required'),
+          content: const Text(
+              'Please grant location permission to continue using the app.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _checkPermissions();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _navigateToNextScreen() {
     // Navigate to the next screen, for example, HomeScreen
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-          builder: (context) => const HomeScreen(title: "Vancouver, Canada")),
+          builder: (context) => const HomeScreen()),
     );
   }
 
@@ -93,7 +137,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(
               height: 10.0,
             ),
-            const Text("Don't worry about the weather we all here",
+            const Text("Don't worry about the weather we all here.",
                 style: TextStyle(
                     fontSize: 14.0,
                     color: Colors.white,
