@@ -154,8 +154,8 @@ class Wind {
 
   factory Wind.fromJson(Map<String, dynamic> json) {
     return Wind(
-      speed: json['speed'],
-      deg: json['deg'],
+      speed: json['speed'].toDouble(),
+      deg: json['deg'].toInt(),
       gust: json['gust'].toDouble(),
     );
   }
@@ -222,22 +222,24 @@ class Coord {
   }
 }
 
-List<ForecastItem> groupByDt(List<ForecastItem> forecastItems) {
-  final Map<String, ForecastItem> groupedItems = {};
+Map<String, List<ForecastItem>> groupByDt(List<ForecastItem> forecastItems) {
+  final Map<String, List<ForecastItem>> groupedItems = {};
 
   // Group items by dt
   for (final item in forecastItems) {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(item.dt * 1000); // Convert dt to DateTime
     final date = DateFormat('yyyy-MM-dd').format(dateTime); // Format DateTime as 'yyyy-MM-dd' string
     if (!groupedItems.containsKey(date)) {
-      groupedItems[date] = (item);
+      groupedItems[date] = [item];
+    } else {
+      groupedItems[date]?.add(item);
     }
   }
 
   var res = groupedItems.values.toList();
 
   // Flatten the grouped items
-  return res;
+  return groupedItems;
 }
 
 List<ForecastItem> getCurrentDateForecast(List<ForecastItem> forecastItems) {

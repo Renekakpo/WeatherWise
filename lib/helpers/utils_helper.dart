@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 const String API_KEY = "05f7a4deffba0f4d53ad6a094e26ad51";
@@ -81,4 +82,24 @@ IconData iconDataFromWeatherType(String type) {
   }
 
   return iconData;
+}
+
+Future myLoadAsset(String path) async {
+  try {
+    // Load the asset bundle
+    AssetBundle bundle = rootBundle;
+
+    // Check if the asset exists
+    bool exists = await bundle.load(path).then((value) => true).catchError((error) => false);
+
+    // If asset exists, return the path
+    if (exists) {
+      return path;
+    } else {
+      return null;
+    }
+  } catch (e) {
+    print("Error: $e");
+    return null;
+  }
 }
