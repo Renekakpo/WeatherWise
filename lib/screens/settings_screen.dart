@@ -1,6 +1,11 @@
+import 'dart:io';
+
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:weatherwise/helpers/shared_preferences_helper.dart';
 import 'package:weatherwise/utils/strings.dart';
 import 'package:weatherwise/widgets/custom_radio_button.dart';
@@ -14,70 +19,67 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _weatherUnit = false;
-  bool _windUnit = false;
-  bool refreshOnTheGo = false;
-  int _selectedOption = 1;
-  int neverOption = 1;
-  int everyHourOpt = 0;
-  int everyThreeHourOpt = 0;
-  int everySixHourOpt = 0;
-  int everyTwelveHourOpt = 0;
-  int everyTwentyFourHourOpt = 0;
+  bool _weatherUnit = false; // Default value
+  bool _windUnit = false; // Default value
+  bool _refreshOnTheGo = false;
+  int _autoRefreshSelectedOption = 0; // Default value
+
+  @override
+  void initState() {
+    super.initState();
+    // Update views when widget initializes
+    _loadUnitsOptions();
+    _loadAutoRefreshSelectedOption();
+    _loadAutoRefreshOnTheGoValue();
+  }
 
   void _onBackArrowPressed() {
     Navigator.pop(context);
   }
 
-  void _onWeatherUnitChanged(bool updatedValue) {
+  Future<void> _loadUnitsOptions() async {
+    setState(() {
+      _weatherUnit = AppSharedPreferences().getWeatherUnit();
+      _windUnit = AppSharedPreferences().getWindUnit();
+    });
+  }
+
+  Future<void> _loadAutoRefreshSelectedOption() async {
+    setState(() {
+      _autoRefreshSelectedOption = AppSharedPreferences()
+          .getAppAutoRefreshSetting(); // Default to 0 if not set
+    });
+  }
+
+  Future<void> _saveAutoRefreshSelectedOption(int value) async {
+    AppSharedPreferences()
+        .setAppAutoRefreshSetting(value); // Save the selected option to pref
+    Navigator.pop(context); // Close the bottom sheet
+  }
+
+  Future<void> _loadAutoRefreshOnTheGoValue() async {
+    setState(() {
+      _refreshOnTheGo = AppSharedPreferences().getAppAutoRefreshOnGoSetting();
+    });
+  }
+
+  void _onWeatherUnitChanged(bool updatedValue) async {
     setState(() {
       _weatherUnit = updatedValue;
-      AppSharedPreferences().setWeatherUnit(updatedValue ? 1 : 0);
+      AppSharedPreferences()
+          .setWeatherUnit(updatedValue); // false: Celsius, true: Fahrenheit
     });
   }
 
-  void _onWindUnitChanged(bool updatedValue) {
+  void _onWindUnitChanged(bool updatedValue) async {
     setState(() {
       _windUnit = updatedValue;
-      AppSharedPreferences().setWeatherUnit(updatedValue ? 1 : 0);
+      AppSharedPreferences()
+          .setWindUnit(updatedValue); // false: Miles, true: Kilometer
     });
   }
 
-  void _onAutoRefreshUpdated(int updatedValue) {
-    setState(() {
-      AppSharedPreferences().setAppAutoRefreshSetting(updatedValue);
-    });
-  }
-
-  void _editAutoRefreshOptions() {
-    int currentAutoRefreshOpt = AppSharedPreferences().getAppAutoRefreshSetting();
-    // Define a map to represent the options and their values
-    final optionsMap = {
-      0: [1, 0, 0, 0, 0, 0],
-      1: [0, 1, 0, 0, 0, 0],
-      3: [0, 0, 1, 0, 0, 0],
-      6: [0, 0, 0, 1, 0, 0],
-      12: [0, 0, 0, 0, 1, 0],
-      24: [0, 0, 0, 0, 0, 1],
-    };
-
-    // Update options based on the currentAutoRefreshOpt
-    if (optionsMap.containsKey(currentAutoRefreshOpt)) {
-      final values = optionsMap[currentAutoRefreshOpt];
-      neverOption = values?[0] ?? 0;
-      everyHourOpt = values?[1] ?? 0;
-      everyThreeHourOpt = values?[2] ?? 0;
-      everySixHourOpt = values?[3] ?? 0;
-      everyTwelveHourOpt = values?[4] ?? 0;
-      everyTwentyFourHourOpt = values?[5] ?? 0;
-    } else {
-      if (kDebugMode) {
-        print("Unknown option");
-      }
-    }
-  }
-
-  void _onAutoRefreshTapped() {
+  void _onShowAutoRefreshOptionsSheet() {
     showModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.white,
@@ -94,46 +96,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         fontWeight: FontWeight.w500)),
                 CustomRadioButton(
                   title: Strings.neverLabel,
-                  value: neverOption,
-                  groupValue: _selectedOption,
+                  value: 0,
+                  groupValue: _autoRefreshSelectedOption,
                   onChanged: (value) {
-                    _onAutoRefreshUpdated(0);
+                    setState(() {
+                      _autoRefreshSelectedOption = value!;
+                      _saveAutoRefreshSelectedOption(value);
+                    });
                   },
                 ),
                 CustomRadioButton(
                     title: Strings.everyHourLabel,
-                    value: everyHourOpt,
-                    groupValue: _selectedOption,
+                    value: 1,
+                    groupValue: _autoRefreshSelectedOption,
                     onChanged: (value) {
-                      _onAutoRefreshUpdated(1);
+                      setState(() {
+                        _autoRefreshSelectedOption = value!;
+                        _saveAutoRefreshSelectedOption(value);
+                      });
                     }),
                 CustomRadioButton(
                     title: Strings.everyThreeHourLabel,
-                    value: everyThreeHourOpt,
-                    groupValue: _selectedOption,
+                    value: 3,
+                    groupValue: _autoRefreshSelectedOption,
                     onChanged: (value) {
-                      _onAutoRefreshUpdated(3);
+                      setState(() {
+                        _autoRefreshSelectedOption = value!;
+                        _saveAutoRefreshSelectedOption(value);
+                      });
                     }),
                 CustomRadioButton(
                     title: Strings.everySixHourLabel,
-                    value: everySixHourOpt,
-                    groupValue: _selectedOption,
+                    value: 6,
+                    groupValue: _autoRefreshSelectedOption,
                     onChanged: (value) {
-                      _onAutoRefreshUpdated(6);
+                      setState(() {
+                        _autoRefreshSelectedOption = value!;
+                        _saveAutoRefreshSelectedOption(value);
+                      });
                     }),
                 CustomRadioButton(
                     title: Strings.everyTwelveHourLabel,
                     value: 12,
-                    groupValue: _selectedOption,
+                    groupValue: _autoRefreshSelectedOption,
                     onChanged: (value) {
-                      _onAutoRefreshUpdated(12);
+                      setState(() {
+                        _autoRefreshSelectedOption = value!;
+                        _saveAutoRefreshSelectedOption(value);
+                      });
                     }),
                 CustomRadioButton(
                     title: Strings.everyTwentyFourHourLabel,
-                    value: everyTwentyFourHourOpt,
-                    groupValue: _selectedOption,
+                    value: 24,
+                    groupValue: _autoRefreshSelectedOption,
                     onChanged: (value) {
-                      _onAutoRefreshUpdated(24);
+                      setState(() {
+                        _autoRefreshSelectedOption = value!;
+                        _saveAutoRefreshSelectedOption(value);
+                      });
                     })
               ],
             ),
@@ -141,14 +161,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
   }
 
-  void _onRefreshOnTheGo(bool value) {
+  void _onRefreshOnTheGo(bool value) async {
     setState(() {
-      refreshOnTheGo = value;
+      _refreshOnTheGo = value;
+      AppSharedPreferences().setAppAutoRefreshOnGoSetting(value);
     });
   }
 
   void _onNotificationsTapped() {
-    print("Notifications tapped!");
+    if (Platform.isAndroid) {
+      const AndroidIntent intent = AndroidIntent(
+        action: 'android.settings.APP_NOTIFICATION_SETTINGS',
+        flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK],
+        arguments: <String, dynamic>{
+          'android.provider.extra.APP_PACKAGE': 'com.example.weatherwise'
+        },
+      );
+      intent.launch();
+    } else if (Platform.isIOS) {
+      FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin>()
+          ?.pendingNotificationRequests();
+      // Open iOS app settings
+    }
   }
 
   void _onShareTapped() {
@@ -237,16 +273,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    // Update views when widget initializes
-    _weatherUnit = AppSharedPreferences().getWeatherUnit() == 1 ? true : false;
-    _windUnit = AppSharedPreferences().getWeatherUnit() == 1 ? true : false;
-    refreshOnTheGo = AppSharedPreferences().getAppAutoRefreshOnGoSetting();
-    _editAutoRefreshOptions();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -260,8 +286,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 fontFamily: 'Roboto',
                 fontSize: 20.0,
                 fontWeight: FontWeight.w700)),
-      ),
+      ), // AppBar
       body: Container(
+        // Body
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
@@ -295,12 +322,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    // Weather Unit
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(Strings.weatherUnitLabel,
                           style: TextStyle(
                               fontFamily: 'Roboto',
-                              fontSize: 17.0,
+                              fontSize: 15.0,
                               fontWeight: FontWeight.w500)),
                       CustomSwitchWithText(
                         activeText: Strings.weatherUnitFahrenheitLabel,
@@ -314,6 +342,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 20.0,
                   ),
                   Row(
+                    // Wind Unit
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(Strings.windUnitLabel,
@@ -362,9 +391,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Material(
+                    // Auto refresh
                     color: Colors.transparent,
                     child: InkWell(
-                        onTap: _onAutoRefreshTapped,
+                        onTap: _onShowAutoRefreshOptionsSheet,
                         borderRadius: BorderRadius.circular(5.0),
                         child: Container(
                             width: double.infinity,
@@ -393,6 +423,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 8.0,
                   ),
                   Container(
+                      // Auto refresh on the go
                       width: double.infinity,
                       padding: const EdgeInsets.all(5.0),
                       child: Row(
@@ -412,7 +443,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           )),
                           Switch(
                               activeColor: Colors.blue,
-                              value: refreshOnTheGo,
+                              value: _refreshOnTheGo,
                               onChanged: _onRefreshOnTheGo)
                         ],
                       )),
@@ -420,6 +451,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 8.0,
                   ),
                   Material(
+                    // Notification
                     color: Colors.transparent,
                     child: InkWell(
                         onTap: _onNotificationsTapped,
@@ -446,6 +478,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 15.0,
                   ),
                   Material(
+                    // Share
                     color: Colors.transparent,
                     child: InkWell(
                         onTap: _onShareTapped,
@@ -474,6 +507,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 15.0,
                   ),
                   Material(
+                    // About
                     color: Colors.transparent,
                     child: InkWell(
                         onTap: _onAboutTapped,
@@ -527,6 +561,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Material(
+                    // Review
                     color: Colors.transparent,
                     child: InkWell(
                         onTap: _onReviewTapped,
@@ -546,6 +581,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     height: 15.0,
                   ),
                   Material(
+                      // Feedback
                       color: Colors.transparent,
                       child: InkWell(
                           onTap: _onFeedbackTapped,
