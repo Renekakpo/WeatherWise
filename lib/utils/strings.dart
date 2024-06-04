@@ -1,6 +1,8 @@
 class Strings {
   Strings._();
 
+  static const String appName = "WeatherWise";
+  static const String appVersion = "Version 1.0.0";
   // Settings screen texts
   static const String weatherSettingsTitle = "Weather settings";
 
@@ -27,4 +29,6 @@ class Strings {
   static const String favouriteLocationDesc =
       "Your favourite location will be used to provide weather information in notifications and other connected services. You can change your favorite location in your location list.";
   static const String celsius = "Celsius";
+  static const String openSource = "Open source licences";
+  static const String contentToShare = "Check out WeatherWise, a comprehensive weather forecasting application built using Flutter. It provides up-to-date weather information for your location and any other locations you are interested in!";
 }

@@ -3,9 +3,10 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:share/share.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:weatherwise/helpers/shared_preferences_helper.dart';
 import 'package:weatherwise/utils/strings.dart';
 import 'package:weatherwise/widgets/custom_radio_button.dart';
@@ -18,7 +19,8 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen>
+    with SingleTickerProviderStateMixin {
   bool _weatherUnit = false; // Default value
   bool _windUnit = false; // Default value
   bool _refreshOnTheGo = false;
@@ -187,22 +189,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _onShareTapped() {
-    print("Shared tapped!");
+  void _onShareTapped() async {
+    Share.share(Strings.contentToShare);
   }
 
-  void _onOpenLicencesTapped() {
-    print("Open app info");
-  }
-
-  void _onOpenAppDetails() {
-    try {} catch (e) {
-      print("Error: $e");
+  Future<void> _onOpenLicencesTapped() async {
+    Uri uri = Uri.parse("https://github.com/Renekakpo/WeatherWise");
+    if (!await launchUrl(uri)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Could not launch screen!"),
+      ));
     }
-    print("Open app details settings");
   }
 
-  void _onAboutTapped() {
+  void _onAboutTapped() async {
     showModalBottomSheet<void>(
         context: context,
         backgroundColor: Colors.white,
@@ -212,22 +212,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                      onPressed: _onOpenAppDetails,
-                      icon: const Icon(Icons.info_outline_rounded)),
-                ),
                 const SizedBox(
-                  height: 5.0,
+                  height: 10.0,
                 ),
-                const Text("WeatherWise",
+                const Text(Strings.appName,
                     style: TextStyle(
                         fontFamily: 'Roboto',
                         fontSize: 16.0,
                         fontWeight: FontWeight.bold)),
                 const SizedBox(height: 5.0),
-                const Text("Version 1.0.0",
+                const Text(Strings.appVersion,
                     style: TextStyle(fontFamily: 'Roboto')),
                 const Expanded(child: SizedBox()),
                 Align(
@@ -247,7 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: const Center(
                               child: Expanded(
                                   child: Text(
-                                "Open source licences",
+                                Strings.openSource,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontFamily: 'Roboto',
@@ -265,11 +259,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _onReviewTapped() {
-    print("Review tapped!");
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Not implemented yet!"),
+    ));
   }
 
   void _onFeedbackTapped() {
-    print("Feedback tapped!");
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text("Not implemented yet!"),
+    ));
   }
 
   @override
