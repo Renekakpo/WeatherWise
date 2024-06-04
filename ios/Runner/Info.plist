@@ -4,7 +4,8 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when open.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>All time location information</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

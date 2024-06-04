@@ -1,6 +1,6 @@
 import 'dart:async';
-
-import 'package:permission_handler/permission_handler.dart';
+import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart' as perm;
 
 class PermissionHelper {
   static final PermissionHelper _instance = PermissionHelper._internal();
@@ -18,33 +18,38 @@ class PermissionHelper {
   Stream<PermissionStatus> get permissionStatusStream =>
       _permissionStatusController.stream;
 
+  final Location _location = Location();
+
   Future<bool> isLocationPermissionGranted() async {
-    final PermissionStatus status = await Permission.location.status;
+    final PermissionStatus status = await _location.hasPermission();
     return status == PermissionStatus.granted;
   }
 
   Future<bool> requestLocationPermission() async {
-    if (await isLocationPermissionGranted()) { // If permission is already granted
+    final bool hasPermission = await isLocationPermissionGranted();
+    if (hasPermission) {
       _permissionStatusController.add(PermissionStatus.granted);
       return true;
     }
 
-    final PermissionStatus status = await Permission.location.request(); // Request for permission
-    _permissionStatusController.add(status); // Add status to stream
+    final PermissionStatus status = await _location.requestPermission();
+    _permissionStatusController.add(status);
     return status == PermissionStatus.granted;
   }
 
   Future<bool> shouldShowLocationRequestRationale() async {
-    const permission = Permission.location;
-    return permission.shouldShowRequestRationale;
+    // The location library does not provide a direct method to check if the rationale should be shown.
+    // You might want to handle this based on your app's logic.
+    return false;
   }
 
   Future<bool> checkLocationPermanentlyDenied() async {
-    return await Permission.location.status.isPermanentlyDenied;
+    final PermissionStatus status = await _location.hasPermission();
+    return status == PermissionStatus.deniedForever;
   }
 
   void openSettings() {
-    openAppSettings();
+    perm.openAppSettings();
   }
 
   // Dispose the stream controller when it's no longer needed

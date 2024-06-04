@@ -76,7 +76,7 @@ class Wind {
     return Wind(
       speed: json['speed'],
       deg: json['deg'],
-      gust: json['gust'],
+      gust: json['gust'] ?? 0.0,
     );
   }
 }
