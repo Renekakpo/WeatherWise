@@ -15,30 +15,20 @@ class AppSharedPreferences {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  int getCounter() {
-    return _prefs.getInt('counter') ?? 0;
+  bool getWeatherUnit() {
+    return _prefs.getBool('weather_unit') ?? false;
   }
 
-  void incrementCounter() {
-    int counter = getCounter();
-    counter++;
-    _prefs.setInt('counter', counter);
+  void setWeatherUnit(bool value) {
+    _prefs.setBool('weather_unit', value);
   }
 
-  int getWeatherUnit() {
-    return _prefs.getInt('weather_unit') ?? 0;
+  bool getWindUnit() {
+    return _prefs.getBool('wind_unit') ?? false;
   }
 
-  void setWeatherUnit(int value) {
-    _prefs.setInt('weather_unit', value);
-  }
-
-  int getWindUnit() {
-    return _prefs.getInt('wind_unit') ?? 0;
-  }
-
-  void setWindUnit(int value) {
-    _prefs.setInt('wind_unit', value);
+  void setWindUnit(bool value) {
+    _prefs.setBool('wind_unit', value);
   }
 
   int getAppAutoRefreshSetting() {

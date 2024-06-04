@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:permission_handler/permission_handler.dart';
 
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 
 import '../helpers/PermissionHelper.dart';
 import 'home_screen.dart';
@@ -24,9 +24,9 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
     // Subscribe to permission status changes
     _permissionStatusSubscription =
         PermissionHelper().permissionStatusStream.listen((status) {
-          if (status.isGranted) {
+          if (status == PermissionStatus.granted) {
             _navigateToNextScreen();
-          } else if (status.isDenied || status.isPermanentlyDenied) {
+          } else if (status == PermissionStatus.denied || status == PermissionStatus.deniedForever) {
             _handleLocationPermissionDenied();
           }
         });
