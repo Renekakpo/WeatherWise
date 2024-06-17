@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weatherwise/helpers/LocationHelper.dart';
 import 'package:weatherwise/models/forecast_data.dart';
@@ -12,7 +13,6 @@ import 'package:weatherwise/screens/settings_screen.dart';
 import 'package:weatherwise/screens/weather_screen.dart';
 import 'package:weatherwise/utils/strings.dart';
 
-import '../helpers/utils_helper.dart';
 import '../models/weather_data.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,7 +23,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final WeatherApiHelper weatherApiHelper = WeatherApiHelper(API_KEY);
+  final WeatherApiHelper weatherApiHelper = WeatherApiHelper(dotenv.env['WEATHER_WISE_API_KEY'] ?? "");
   late Position _currentPosition;
   WeatherData? _weatherData;
   ForecastData? _forecastData;
