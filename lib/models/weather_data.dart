@@ -22,10 +22,10 @@ class Weather {
 
   factory Weather.fromJson(Map<String, dynamic> json) {
     return Weather(
-      id: json['id'],
-      main: json['main'],
-      description: json['description'],
-      icon: json['icon'],
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      main: json['main'].toString(),
+      description: json['description'].toString(),
+      icon: json['icon'].toString(),
     );
   }
 }
@@ -53,14 +53,14 @@ class Main {
 
   factory Main.fromJson(Map<String, dynamic> json) {
     return Main(
-      temp: json['temp'],
-      feelsLike: json['feels_like'],
-      tempMin: json['temp_min'],
-      tempMax: json['temp_max'],
-      pressure: json['pressure'],
-      humidity: json['humidity'],
-      seaLevel: (json['sea_level'] ?? 0).toInt(),
-      grndLevel: json['grnd_level'] ?? 0,
+      temp: double.tryParse(json['temp'].toString()) ?? 0.0,
+      feelsLike: double.tryParse(json['feels_like'].toString()) ?? 0.0,
+      tempMin: double.tryParse(json['temp_min'].toString()) ?? 0.0,
+      tempMax: double.tryParse(json['temp_max'].toString()) ?? 0.0,
+      pressure: int.tryParse(json['pressure'].toString()) ?? 0,
+      humidity: int.tryParse(json['humidity'].toString()) ?? 0,
+      seaLevel: int.tryParse(json['sea_level'].toString()) ?? 0,
+      grndLevel: int.tryParse(json['grnd_level'].toString()) ?? 0,
     );
   }
 }
@@ -74,9 +74,9 @@ class Wind {
 
   factory Wind.fromJson(Map<String, dynamic> json) {
     return Wind(
-      speed: json['speed'],
-      deg: json['deg'],
-      gust: json['gust'] ?? 0.0,
+      speed: double.tryParse(json['speed'].toString()) ?? 0.0,
+      deg: int.tryParse(json['deg'].toString()) ?? 0,
+      gust: double.tryParse(json['gust'].toString()) ?? 0.0,
     );
   }
 }
@@ -90,9 +90,9 @@ class Sys {
 
   factory Sys.fromJson(Map<String, dynamic> json) {
     return Sys(
-      country: json['country'],
-      sunrise: json['sunrise'],
-      sunset: json['sunset'],
+      country: json['country'].toString(),
+      sunrise: int.tryParse(json['sunrise'].toString()) ?? 0,
+      sunset: int.tryParse(json['sunset'].toString()) ?? 0,
     );
   }
 }
@@ -104,7 +104,7 @@ class Clouds {
 
   factory Clouds.fromJson(Map<String, dynamic> json) {
     return Clouds(
-      all: json['all'],
+      all: int.tryParse(json['all'].toString()) ?? 0,
     );
   }
 }
@@ -144,17 +144,17 @@ class WeatherData {
     return WeatherData(
       coord: Coord.fromJson(json['coord']),
       weather: (json['weather'] as List).map((e) => Weather.fromJson(e)).toList(),
-      base: json['base'],
+      base: json['base'].toString(),
       main: Main.fromJson(json['main']),
-      visibility: json['visibility'],
+      visibility: int.tryParse(json['visibility'].toString()) ?? 0,
       wind: Wind.fromJson(json['wind']),
       clouds: Clouds.fromJson(json['clouds']),
-      dt: json['dt'],
+      dt: int.tryParse(json['dt'].toString()) ?? 0,
       sys: Sys.fromJson(json['sys']),
-      timezone: json['timezone'],
-      id: json['id'],
-      name: json['name'],
-      cod: json['cod'],
+      timezone: int.tryParse(json['timezone'].toString()) ?? 0,
+      id: int.tryParse(json['id'].toString()) ?? 0,
+      name: json['name'].toString(),
+      cod: int.tryParse(json['cod'].toString()) ?? 0,
     );
   }
 }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import '../helpers/fake_data.dart';
+import 'package:lottie/lottie.dart';
+
+import '../helpers/DatabaseHelper.dart';
+import '../helpers/LocationHelper.dart';
 import '../helpers/utils_helper.dart';
 import '../models/manage_location.dart';
+import 'add_location_screen.dart';
 
 class ManageLocationsScreen extends StatefulWidget {
   const ManageLocationsScreen({super.key});
@@ -11,18 +15,44 @@ class ManageLocationsScreen extends StatefulWidget {
 }
 
 class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
+  final dbHelper = DatabaseHelper();
   bool isEditing = false;
+  bool _isDeviceLocationOn = false;
   List<ManageLocation> selectedLocations = [];
+  List<ManageLocation> locations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkDeviceLocationStatus(); // Check if device location is on or off
+    _loadLocations(); // Load locations when the widget is first built
+  }
+
+  Future<void> _checkDeviceLocationStatus() async {
+    final status = await LocationHelper().isLocationServiceEnabled();
+    setState(() {
+      _isDeviceLocationOn = status;
+    });
+  }
+
+  Future<void> _loadLocations() async {
+    final allLocations = await dbHelper.getAllLocations();
+    setState(() {
+      locations = allLocations.reversed.toList();
+    });
+  }
 
   void _onBackArrowPressed() {
     Navigator.pop(context);
   }
 
   void _toggleEditing() {
-    setState(() {
-      isEditing = !isEditing;
-      selectedLocations.clear();
-    });
+    if (locations.isNotEmpty) {
+      setState(() {
+        isEditing = !isEditing;
+        selectedLocations.clear();
+      });
+    }
   }
 
   void _onItemTap(ManageLocation location) {
@@ -37,10 +67,14 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
 
   void _onSetFavouritePressed() {
     setState(() {
-      var locationToSetAsFavourite = selectedLocations.first;
+      var favouriteLocation = selectedLocations.first;
+      // Update the favourite location in database
+      if (favouriteLocation.id != null) {
+        dbHelper.setFavoriteLocation(favouriteLocation.id!);
+      }
+      // Update the local list
       for (var location in locations) {
-        location.isFavorite =
-            location == locationToSetAsFavourite ? true : false;
+        location.isFavorite = location == favouriteLocation ? true : false;
       }
       selectedLocations.first.isFavorite = true;
     });
@@ -49,6 +83,10 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
   void _onDeletePressed() {
     setState(() {
       try {
+        // Delete the location from database
+        if (selectedLocations.first.id != null) {
+          dbHelper.deleteLocation(selectedLocations.first.id!);
+        }
         // Remove selected location from the main list
         locations.removeWhere((element) => selectedLocations.contains(element));
         // Clear selected locations list
@@ -64,6 +102,8 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
   void _onDeleteAllPressed() {
     setState(() {
       try {
+        // Delete all entries from the database
+        dbHelper.deleteAllLocations();
         // Clear the main list
         locations.clear();
         // Clear the selected locations list
@@ -110,23 +150,39 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
     showModalBottomSheet<void>(
       context: context,
       builder: (BuildContext context) {
-        if (favoriteLocations.isNotEmpty && otherLocations.isNotEmpty) {
-          // If both favorite and other locations are selected
-          return _buildDeleteAllOption();
-        } else if (favoriteLocations.isNotEmpty) {
-          // If only favorite locations are selected
-          return _buildDeleteOption();
-        } else if (otherLocations.isNotEmpty && otherLocations.length == 1) {
-          // If only one other location is selected
-          return _buildSetFavoriteAndDeleteOption();
-        } else if (otherLocations.isNotEmpty && otherLocations.length > 1) {
-          // If other locations are selected
-          return _buildDeleteAllOption();
-        } else {
-          return Container(); // No locations selected, do nothing
-        }
+        return SizedBox(
+          height: 60,
+          child: Center(
+            child:
+                // Conditionally render widget based on selected locations
+                favoriteLocations.isNotEmpty
+                    ? // If favorite locations exist
+                    otherLocations.isNotEmpty
+                        ? //  and other locations exist, show "Delete All" option
+                        _buildDeleteAllOption()
+                        : //  but other locations are empty, show "Delete" option
+                        _buildDeleteOption()
+                    : otherLocations.isNotEmpty
+                        ? // If favorite locations are empty but other locations exist
+                        otherLocations.length == 1
+                            ? //  and there's only one other location, show "Set Favorite & Delete" option
+                            _buildSetFavoriteAndDeleteOption()
+                            : //  otherwise (multiple other locations), show "Delete All" option
+                            _buildDeleteAllOption()
+                        : Container(), // No locations selected, do nothing
+          ),
+        );
       },
     );
+  }
+
+  Future<void> _navigateToAddLocationScreen() async {
+    // Navigate to AddLocationScreen and await for the result
+    await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const AddLocationScreen()));
+
+    // Reload the locations when returning from the AddLocationScreen
+    _loadLocations();
   }
 
   @override
@@ -174,9 +230,7 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.add),
-                      onPressed: () {
-                        print("Add location.");
-                      },
+                      onPressed: _navigateToAddLocationScreen,
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit),
@@ -186,16 +240,30 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
                 )
         ],
       ),
-      body: ListView(
-        children: [
-          if (locations.any((location) => location.isFavorite))
-            _buildSection("Favourite location",
-                locations.where((location) => location.isFavorite).toList()),
-          if (locations.any((location) => !location.isFavorite))
-            _buildSection("Other locations",
-                locations.where((location) => !location.isFavorite).toList()),
-        ],
-      ),
+      body: locations.isEmpty
+          ? const Center(
+              child: Text("Press on + to add a location.",
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: 16.0,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.normal)))
+          : ListView(
+              children: [
+                if (locations.any((location) => location.isFavorite))
+                  _buildSection(
+                      "Favourite location",
+                      locations
+                          .where((location) => location.isFavorite)
+                          .toList()),
+                if (locations.any((location) => !location.isFavorite))
+                  _buildSection(
+                      "Other locations",
+                      locations
+                          .where((location) => !location.isFavorite)
+                          .toList()),
+              ],
+            ),
     );
   }
 
@@ -257,7 +325,9 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
   Widget _buildLocationItem(ManageLocation location) {
     return Row(
       children: [
-        _buildLocationIcon(location.useDeviceLocation),
+        location.isFavorite
+            ? _buildLocationIcon(_isDeviceLocationOn)
+            : const SizedBox(),
         const SizedBox(
           width: 15.0,
         ),
@@ -321,35 +391,55 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
 
   Widget _buildWeatherInfo(bool useDeviceLocation, String weatherCondition,
       double currentTemp, double minTemp, double maxTemp) {
-    if (useDeviceLocation) {
-      // Fetch and display weather information based on device location
-      return Column(
-        children: [
-          Row(
-            children: [
-              _buildWeatherIcon(weatherCondition),
-              const SizedBox(
-                width: 5.0,
-              ),
-              Text("${currentTemp.toStringAsFixed(0)}º",
-                  style: const TextStyle(fontFamily: 'Roboto', fontSize: 20.0)),
-            ],
-          ),
-          Text(
-              "${maxTemp.toStringAsFixed(0)}º / ${minTemp.toStringAsFixed(0)}º",
-              style: const TextStyle(fontSize: 12.0, color: Colors.grey)),
-        ],
-      );
-    } else {
-      // Display placeholder or implement logic for other cases
-      return const Text("N/A", style: TextStyle(fontFamily: 'Roboto'));
-    }
+    // Fetch and display weather information based on device location
+    return Column(
+      children: [
+        Row(
+          children: [
+            _buildWeatherIcon(weatherCondition),
+            const SizedBox(
+              width: 5.0,
+            ),
+            Text("${currentTemp.toStringAsFixed(0)}º",
+                style: const TextStyle(fontFamily: 'Roboto', fontSize: 20.0)),
+          ],
+        ),
+        Text("${maxTemp.toStringAsFixed(0)}º / ${minTemp.toStringAsFixed(0)}º",
+            style: const TextStyle(fontSize: 12.0, color: Colors.grey)),
+      ],
+    );
   }
 
   Widget _buildWeatherIcon(String weatherCondition) {
-    // Implement logic to map weather conditions to icons
-    // For example: return Icon(Icons.cloud) for "cloudy"
-    return const Icon(Icons.cloud);
+    return FutureBuilder(
+        future: myLoadAsset(
+            "assets/icons/${weatherCondition.toLowerCase().replaceAll(" ", "-")}.json"),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Return a loading widget while the future is resolving
+            return const CircularProgressIndicator(); // Or any other loading indicator
+          } else if (snapshot.hasError) {
+            // Handle error case if necessary
+            print('Error: ${snapshot.error}');
+            return const SizedBox.shrink();
+          } else {
+            // If the future has resolved successfully
+            final assetPath = snapshot.data;
+            if (assetPath != null) {
+              // If assetPath is not null, display the Lottie animation
+              return Lottie.asset(
+                  assetPath,
+                  width: 30.0,
+                  height: 30.0,
+                  backgroundLoading: true,
+                  filterQuality: FilterQuality.high,
+              );
+            } else {
+              // If assetPath is null, don't display anything
+              return const SizedBox.shrink(); // or any other empty widget
+            }
+          }
+        });
   }
 
   Widget _buildSetFavoriteAndDeleteOption() {
