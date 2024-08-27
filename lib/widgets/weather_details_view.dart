@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:weatherwise/models/weather_data.dart';
 import 'package:weatherwise/utils/strings.dart';
 
@@ -65,12 +64,10 @@ class WeatherDetailsView extends StatelessWidget {
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Lottie.asset("assets/icons/thermometer-warmer.json",
-              width: mWidth * 0.2, height: mWidth * 0.2),
-          // const Icon(Icons.thermostat, size: 40.0, color: Colors.white,),
+          Image.asset("assets/images/weather_temp.png", width: mWidth * 0.1, height: mWidth * 0.1),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,11 +92,10 @@ class WeatherDetailsView extends StatelessWidget {
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Lottie.asset("assets/icons/wind-gust.json",
-              width: mWidth * 0.15, height: mWidth * 0.15),
+          Image.asset("assets/images/weather_wind.png", width: mWidth * 0.1, height: mWidth * 0.1),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,11 +120,11 @@ class WeatherDetailsView extends StatelessWidget {
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Lottie.asset("assets/icons/pressure-low.json",
-              width: mWidth * 0.2, height: mWidth * 0.2),
+          Image.asset('assets/images/weather_pressure.png',
+              width: mWidth * 0.1, height: mWidth * 0.1),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,11 +149,11 @@ class WeatherDetailsView extends StatelessWidget {
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Lottie.asset("assets/icons/raindrop.json",
-              width: mWidth * 0.2, height: mWidth * 0.2),
+          Image.asset("assets/images/weather_humidity.png",
+              width: mWidth * 0.08, height: mWidth * 0.08,),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,

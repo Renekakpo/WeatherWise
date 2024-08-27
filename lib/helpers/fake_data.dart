@@ -1,7 +1,7 @@
 import '../models/forecast_weather_data.dart';
 import '../models/manage_location.dart';
 
-List<ManageLocation> locations = [
+/*List<ManageLocation> locations = [
   ManageLocation(
     name: "Cotonou",
     region: "Littoral, Benin",
@@ -139,7 +139,7 @@ List<ForecastWeatherData> generateDummyData() {
   }
 
   return data;
-}
+}*/
 
 // Get today's date
 DateTime today = DateTime.now();
