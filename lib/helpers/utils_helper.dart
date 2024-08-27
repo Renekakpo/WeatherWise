@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
-const String API_KEY = "05f7a4deffba0f4d53ad6a094e26ad51";
 
 String formatDateTime(DateTime dateTime) {
   return DateFormat('E, d MMM H:mm').format(dateTime);

@@ -31,4 +31,11 @@ class Strings {
   static const String celsius = "Celsius";
   static const String openSource = "Open source licences";
   static const String contentToShare = "Check out WeatherWise, a comprehensive weather forecasting application built using Flutter. It provides up-to-date weather information for your location and any other locations you are interested in!";
+  static const String wrongLocationLabel = "Report wrong location";
+  static const String supportCenterLabel = "Support Center";
+  static const String supportCenterSubHeader = "Help up improve your experience by filling the form below.";
+  static const String invalidEmailErrorText = "Please enter your email";
+  static const String issueDescriptionText = "Issue Description";
+  static const String invalidIssueDescText = "Please enter the issue description";
+  static const String submitText = "Submit";
 }
