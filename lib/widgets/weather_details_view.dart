@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:weatherwise/models/weather_data.dart';
 import 'package:weatherwise/utils/strings.dart';
 
