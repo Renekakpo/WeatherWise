@@ -23,14 +23,6 @@ class AppSharedPreferences {
     _prefs.setBool('weather_unit', value);
   }
 
-  bool getWindUnit() {
-    return _prefs.getBool('wind_unit') ?? false;
-  }
-
-  void setWindUnit(bool value) {
-    _prefs.setBool('wind_unit', value);
-  }
-
   int getAppAutoRefreshSetting() {
     return _prefs.getInt('auto_refresh_app') ?? 0;
   }

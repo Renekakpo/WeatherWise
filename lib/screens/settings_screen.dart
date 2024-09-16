@@ -12,6 +12,8 @@ import 'package:weatherwise/utils/strings.dart';
 import 'package:weatherwise/widgets/custom_radio_button.dart';
 import 'package:weatherwise/widgets/custom_switch_with_text.dart';
 
+import '../utils/wcolors.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -22,7 +24,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   bool _weatherUnit = false; // Default value
-  bool _windUnit = false; // Default value
   bool _refreshOnTheGo = false;
   int _autoRefreshSelectedOption = 0; // Default value
 
@@ -36,13 +37,12 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _onBackArrowPressed() {
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   Future<void> _loadUnitsOptions() async {
     setState(() {
       _weatherUnit = AppSharedPreferences().getWeatherUnit();
-      _windUnit = AppSharedPreferences().getWindUnit();
     });
   }
 
@@ -70,14 +70,6 @@ class _SettingsScreenState extends State<SettingsScreen>
       _weatherUnit = updatedValue;
       AppSharedPreferences()
           .setWeatherUnit(updatedValue); // false: Celsius, true: Fahrenheit
-    });
-  }
-
-  void _onWindUnitChanged(bool updatedValue) async {
-    setState(() {
-      _windUnit = updatedValue;
-      AppSharedPreferences()
-          .setWindUnit(updatedValue); // false: Miles, true: Kilometer
     });
   }
 
@@ -336,7 +328,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                       )
                     ],
                   ),
-                  const SizedBox(
+                  /*const SizedBox(
                     height: 20.0,
                   ),
                   Row(
@@ -355,7 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                         onUnitChanged: _onWindUnitChanged,
                       )
                     ],
-                  )
+                  )*/
                 ],
               ),
             ),
@@ -440,7 +432,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                             style: TextStyle(fontSize: 17.0),
                           )),
                           Switch(
-                              activeColor: Colors.blue,
+                              activeColor: WColors.blueGray500,
                               value: _refreshOnTheGo,
                               onChanged: _onRefreshOnTheGo)
                         ],

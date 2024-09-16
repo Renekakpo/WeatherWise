@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weatherwise/models/forecast_data.dart';
 
 import '../helpers/utils_helper.dart';
+import '../utils/wcolors.dart';
 import 'forecast_data_item.dart';
 
 class ForecastCard extends StatefulWidget {
@@ -24,7 +25,7 @@ class _ForecastCardState extends State<ForecastCard> {
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0),
-          color: Colors.white,
+          color: WColors.blueGray300,
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
@@ -51,7 +52,7 @@ class _ForecastCardState extends State<ForecastCard> {
                     child: Container(
                       padding: const EdgeInsets.all(10),
                       child: Text(
-                        // You need to format your date from timestamp here
+                        // Format the date from timestamp
                         getDayNameFromTimestamp(widget
                             .forecastItems[
                                 widget.forecastItems.keys.toList()[index]]!
@@ -59,8 +60,8 @@ class _ForecastCardState extends State<ForecastCard> {
                             .dt),
                         style: TextStyle(
                             color: index == selectedDayIndex
-                                ? const Color(0XFF117CEB)
-                                : Colors.grey.withOpacity(0.4)),
+                                ? WColors.blueGray900
+                                : Colors.white70),
                       ),
                     ),
                   );
@@ -68,7 +69,7 @@ class _ForecastCardState extends State<ForecastCard> {
               ),
             ),
             Divider(
-              color: const Color(0XFF117CEB).withOpacity(0.3),
+              color: Colors.white.withOpacity(0.3),
               height: 0.1,
             ),
             // Data section for selected day

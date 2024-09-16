@@ -1,14 +1,15 @@
 import 'dart:convert';
-import 'dart:ffi';
-import 'dart:io';
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:weatherwise/helpers/utils_helper.dart';
 
-import '../helpers/DatabaseHelper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:lottie/lottie.dart';
+import 'package:weatherwise/utils/wcolors.dart';
+
+import '../helpers/database_helper.dart';
+import '../helpers/shared_preferences_helper.dart';
 import '../models/manage_location.dart';
-import '../network/WeatherApiHelper.dart';
+import '../network/weather_api_helper.dart';
 
 class AddLocationScreen extends StatefulWidget {
   const AddLocationScreen({super.key});
@@ -21,8 +22,17 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   final TextEditingController _controller = TextEditingController();
   List<dynamic> _cities = [];
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  final WeatherApiHelper _weatherApiHelper = WeatherApiHelper(API_KEY);
+  final WeatherApiHelper _weatherApiHelper = WeatherApiHelper(dotenv.env['WEATHER_WISE_API_KEY'] ?? "");
   bool _isLoading = false;
+  String units = "metric";
+  String errorMessage = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    loadUnits();
+  }
 
   void _onBackArrowPressed() {
     Navigator.pop(context);
@@ -31,6 +41,15 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   void updateLoaderState(bool state) {
     setState(() {
       _isLoading = state;
+    });
+  }
+
+  Future<void> loadUnits() async {
+    setState(() {
+      bool unit = AppSharedPreferences().getWeatherUnit();
+      // Imperial gives temp in Fahrenheit and wind speed in miles/h
+      // while metric gives temp in Celsius and wind speed in m/s
+      units = unit ? "imperial" : "metric";
     });
   }
 
@@ -54,38 +73,50 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
         _cities = uniqueCities;
       });
     } else {
-      throw Exception('Failed to load cities');
+      errorMessage = "Failed to load cities";
+      updateLoaderState(false);
     }
   }
 
   Future<void> _fetchWeatherAndSaveLocation(
       String region, double lat, double lng) async {
-    // Display loader and prevent user from touching the view
-    updateLoaderState(true);
+    try {
+      // Display loader and prevent user from touching the view
+      updateLoaderState(true);
 
-    // Fetch weather data for the selected location
-    final weatherData = await _weatherApiHelper.getCurrentWeatherData(lat, lng);
+      // Fetch weather data for the selected location
+      final weatherData = await _weatherApiHelper.getCurrentWeatherData(lat, lng, units);
 
-    // If there is data, initialized a ManageLocation object
-    if (weatherData != null) {
-      final location = ManageLocation(
-        name: weatherData.name,
-        region: region,
-        isFavorite: false,
-        useDeviceLocation: false,
-        weatherCondition: weatherData.weather.first.main,
-        currentTemperature: weatherData.main.temp,
-        minTemperature: weatherData.main.tempMin,
-        maxTemperature: weatherData.main.tempMax,
-      );
+      // If there is data, initialized a ManageLocation object
+      if (weatherData != null) {
+        final location = ManageLocation(
+          name: weatherData.name,
+          region: region,
+          latitude: weatherData.coord.lat,
+          longitude: weatherData.coord.lon,
+          isFavorite: false,
+          useDeviceLocation: false,
+          weatherCondition: weatherData.weather.first.main,
+          weatherIconId: weatherData.weather.first.icon,
+          currentTemperature: weatherData.main.temp,
+          minTemperature: weatherData.main.tempMin,
+          maxTemperature: weatherData.main.tempMax,
+        );
 
-      // Save the object to the local database
-      await _databaseHelper.insertLocation(location);
+        // Save the object to the local database
+        await _databaseHelper.insertLocation(location);
 
-      // Navigate back
-      _onBackArrowPressed();
-    } else {
-      print("No weather data found.");
+        // Navigate back
+        _onBackArrowPressed();
+      } else {
+        // Display errorMessage
+        errorMessage = "Failed to fetch weather data!";
+        // Remove loader
+        updateLoaderState(false);
+      }
+    } catch(e) {
+      // Display errorMessage
+      errorMessage = "Error: ${e.toString()}";
       // Remove loader
       updateLoaderState(false);
     }
@@ -95,7 +126,7 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFD),
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
@@ -129,10 +160,10 @@ class _AddLocationScreenState extends State<AddLocationScreen> {
               child: Lottie.asset("assets/icons/loader_animation.json",
                   width: 120.0, height: 120.0))
           : _cities.isEmpty
-              ? const Center(
-                  child: Text("Enter a location name.",
+              ? Center(
+                  child: Text(errorMessage.isEmpty ? "Enter a location name." : errorMessage,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 18.0,
                           fontFamily: 'Roboto',
                           fontWeight: FontWeight.w500)),

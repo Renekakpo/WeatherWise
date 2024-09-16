@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:weatherwise/utils/wcolors.dart';
 
 class CustomSwitchWithText extends StatefulWidget {
   final Function(bool) onUnitChanged;
@@ -35,9 +36,9 @@ class _CustomSwitchWithTextState extends State<CustomSwitchWithText> {
               const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
         ),
         activeText: widget.inactiveText,
-        activeTextColor: Colors.grey.shade500,
+        activeTextColor: Colors.white,
         activeTextFontWeight: FontWeight.w500,
-        activeColor: Colors.grey.shade100,
+        activeColor: WColors.blueGray200,
         inactiveIcon: Text(widget.inactiveText,
             style: const TextStyle(
                 fontWeight: FontWeight.w500, color: Colors.white)),
@@ -45,7 +46,7 @@ class _CustomSwitchWithTextState extends State<CustomSwitchWithText> {
         inactiveTextColor: Colors.grey.shade500,
         inactiveColor: Colors.grey.shade100,
         inactiveTextFontWeight: FontWeight.w500,
-        toggleColor: Colors.blue,
+        toggleColor: WColors.blueGray500,
         value: widget.unitValue,
         onToggle: (val) {
           widget.onUnitChanged(val);

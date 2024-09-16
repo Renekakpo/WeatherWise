@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -96,7 +97,45 @@ Future myLoadAsset(String path) async {
       return null;
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     return null;
   }
+}
+
+String getWeatherDescription(double temperature) {
+  if (temperature < 0) {
+    return "It's freezing outside! Bundle up warmly.";
+  } else if (temperature >= 0 && temperature < 10) {
+    return "It's quite cold. Don't forget your jacket.";
+  } else if (temperature >= 10 && temperature < 20) {
+    return "It's cool outside. A light sweater should be enough.";
+  } else if (temperature >= 20 && temperature < 30) {
+    return "The weather is warm and pleasant.";
+  } else if (temperature >= 30 && temperature < 40) {
+    return "It's hot outside! Stay hydrated.";
+  } else if (temperature >= 40) {
+    return "It's extremely hot! Avoid going out if possible.";
+  } else {
+    return "Temperature out of range.";
+  }
+}
+
+double convertFromMeterToKilometer(bool isWeatherUnit, double windSpeed) {
+  try {
+    if (!isWeatherUnit) { // When isWeatherUnit false(Celsius), unit is metric and wind speed in meters per second
+      // Convert wind speed from meters per second to kilometers per hour
+      return windSpeed * 3.6;
+    } else { // When isWeatherUnit true(Fahrenheit), unit is imperial and wind speed in miles per second
+      // Convert wind speed from miles per second to kilo miles per hour
+      return (windSpeed * 3600) / 1000; // 3600 to convert seconds to hours, then divide by 1000 for kilo miles
+    }
+  } catch(e) {
+    if (kDebugMode) {
+      print(e);
+    }
+  }
+
+  return windSpeed; // Return default windSpeed if error
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 
-import '../helpers/DatabaseHelper.dart';
-import '../helpers/LocationHelper.dart';
+import '../helpers/database_helper.dart';
+import '../helpers/location_helper.dart';
 import '../helpers/utils_helper.dart';
 import '../models/manage_location.dart';
 import 'add_location_screen.dart';
@@ -43,7 +42,7 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
   }
 
   void _onBackArrowPressed() {
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   void _toggleEditing() {
@@ -353,7 +352,7 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
         const Expanded(child: SizedBox()),
         _buildWeatherInfo(
             location.useDeviceLocation,
-            location.weatherCondition,
+            location.weatherIconId,
             location.currentTemperature,
             location.minTemperature,
             location.maxTemperature),
@@ -389,14 +388,16 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
     return Icon(useDeviceLocation ? Icons.location_on : Icons.location_off);
   }
 
-  Widget _buildWeatherInfo(bool useDeviceLocation, String weatherCondition,
+  // Fetch and display weather information based on device location
+  Widget _buildWeatherInfo(bool useDeviceLocation, String iconId,
       double currentTemp, double minTemp, double maxTemp) {
-    // Fetch and display weather information based on device location
+    String weatherIconUrl = "https://openweathermap.org/img/wn/$iconId@2x.png";
     return Column(
       children: [
         Row(
           children: [
-            _buildWeatherIcon(weatherCondition),
+            // _buildWeatherIcon(weatherCondition),
+            Image.network(weatherIconUrl),
             const SizedBox(
               width: 5.0,
             ),
@@ -408,38 +409,6 @@ class _ManageLocationsScreenState extends State<ManageLocationsScreen> {
             style: const TextStyle(fontSize: 12.0, color: Colors.grey)),
       ],
     );
-  }
-
-  Widget _buildWeatherIcon(String weatherCondition) {
-    return FutureBuilder(
-        future: myLoadAsset(
-            "assets/icons/${weatherCondition.toLowerCase().replaceAll(" ", "-")}.json"),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Return a loading widget while the future is resolving
-            return const CircularProgressIndicator(); // Or any other loading indicator
-          } else if (snapshot.hasError) {
-            // Handle error case if necessary
-            print('Error: ${snapshot.error}');
-            return const SizedBox.shrink();
-          } else {
-            // If the future has resolved successfully
-            final assetPath = snapshot.data;
-            if (assetPath != null) {
-              // If assetPath is not null, display the Lottie animation
-              return Lottie.asset(
-                  assetPath,
-                  width: 30.0,
-                  height: 30.0,
-                  backgroundLoading: true,
-                  filterQuality: FilterQuality.high,
-              );
-            } else {
-              // If assetPath is null, don't display anything
-              return const SizedBox.shrink(); // or any other empty widget
-            }
-          }
-        });
   }
 
   Widget _buildSetFavoriteAndDeleteOption() {

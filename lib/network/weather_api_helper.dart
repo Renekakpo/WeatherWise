@@ -9,9 +9,9 @@ class WeatherApiHelper {
 
   WeatherApiHelper(this.apiKey);
 
-  Future<WeatherData?> getCurrentWeatherData(double latitude, double longitude) async {
+  Future<WeatherData?> getCurrentWeatherData(double latitude, double longitude, String units) async {
     const String endpoint = "/weather";
-    final String url = "$baseUrl$endpoint?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric";
+    final String url = "$baseUrl$endpoint?lat=$latitude&lon=$longitude&appid=$apiKey&units=$units";
 
     final response = await http.get(Uri.parse(url));
 
@@ -23,9 +23,9 @@ class WeatherApiHelper {
     }
   }
 
-  Future<ForecastData?> getForecastData(double latitude, double longitude) async {
+  Future<ForecastData?> getForecastData(double latitude, double longitude, String units) async {
     const String endpoint = "/forecast";
-    final String url = "$baseUrl$endpoint?lat=$latitude&lon=$longitude&appid=$apiKey&units=metric";
+    final String url = "$baseUrl$endpoint?lat=$latitude&lon=$longitude&appid=$apiKey&units=$units";
 
     final response = await http.get(Uri.parse(url));
 

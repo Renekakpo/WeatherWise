@@ -13,7 +13,8 @@ class ForecastDataItem extends StatelessWidget {
   Widget build(BuildContext context) {
     double mSize = MediaQuery.of(context).size.width;
     const textStyle =
-        TextStyle(color: Colors.black87, fontWeight: FontWeight.w500);
+        TextStyle(color: Colors.white, fontWeight: FontWeight.w500);
+    String weatherIconUrl = "https://openweathermap.org/img/wn/${data.weather.first.icon}@2x.png";
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
@@ -27,37 +28,7 @@ class ForecastDataItem extends StatelessWidget {
           const SizedBox(
             height: 10.0,
           ),
-          FutureBuilder(
-              future: myLoadAsset(
-                  "assets/icons/${data.weather.first.main.toLowerCase().replaceAll(" ", "-")}.json"),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Return a loading widget while the future is resolving
-                  return const CircularProgressIndicator(); // Or any other loading indicator
-                } else if (snapshot.hasError) {
-                  // Handle error case if necessary
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  // If the future has resolved successfully
-                  final assetPath = snapshot.data;
-                  if (assetPath != null) {
-                    // If assetPath is not null, display the Lottie animation
-                    return Expanded(
-                      child: Lottie.asset(
-                        assetPath,
-                        width: mSize * 0.05,
-                        height: mSize * 0.05,
-                        backgroundLoading: true,
-                        filterQuality: FilterQuality.high,
-                      ),
-                    );
-                  } else {
-                    // If assetPath is null, don't display anything
-                    return const Expanded(child: SizedBox()); // or any other empty widget
-                  }
-                }
-              }),
-          // Icon(iconDataFromWeatherType(data.weatherType), color: Colors.white,),
+          Image.network(weatherIconUrl, width: mSize * 0.1, height: mSize * 0.1,),
           const SizedBox(
             height: 10.0,
           ),
@@ -69,7 +40,7 @@ class ForecastDataItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Lottie.asset("assets/icons/raindrop.json",
-                  width: 25.0, height: 25.0),
+                  width: 30.0, height: 30.0),
               Text('${(data.pop * 100).toStringAsFixed(0)}%', style: textStyle),
             ],
           ),

@@ -56,6 +56,8 @@ dependencies:
   connectivity_plus: ^2.0.2
   logger: ^1.0.0
   flutter_email_sender: ^6.0.3
+  permission_handler: ^11.2.0
+  path_provider: ^2.0.11
 #  app_settings: ^5.1.1
 
 dev_dependencies:
@@ -68,7 +70,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  permission_handler: ^11.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

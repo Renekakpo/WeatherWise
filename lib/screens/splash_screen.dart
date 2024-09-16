@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-import '../helpers/PermissionHelper.dart';
+import '../helpers/notification_helper.dart';
+import '../helpers/permission_helper.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,6 +17,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver {
   StreamSubscription<PermissionStatus>? _permissionStatusSubscription;
   bool _openedAppSettings = false;
+  // Instance of notification helper class
+  final NotificationHelper _notificationHelper = NotificationHelper();
 
   @override
   void initState() {
@@ -100,6 +103,9 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
+    // Initialize notification helper object
+    _notificationHelper.initialize(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

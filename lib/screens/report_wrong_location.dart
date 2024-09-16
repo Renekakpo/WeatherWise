@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:weatherwise/widgets/custom_input_field.dart';
 
-import '../helpers/SupportCenterHelper.dart';
+import '../helpers/support_center_helper.dart';
 import '../utils/strings.dart';
 import '../widgets/custom_button.dart';
 
