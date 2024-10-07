@@ -19,11 +19,11 @@ WeatherWise is a comprehensive weather forecasting application built using Flutt
 
 ## Screenshots
 
-![Screenshot 1](screenshots/screenshot1.png)
-*Description of screenshot 1.*
-
-![Screenshot 2](screenshots/screenshot2.png)
-*Description of screenshot 2.*
+<div style="display: flex; flex-wrap: wrap; justify-content: space-around;">
+    <img src="./screenshots/splash_screen.png" alt="SplashScreen" width="225" height="450" />
+    <img src="./screenshots/home_screen.png" alt="HomeScreen" width="225" height="450" />
+    <img src="./screenshots/settings_screen.png" alt="SettingsScreen" width="225" height="450" />
+</div>
 
 ## Installation
 

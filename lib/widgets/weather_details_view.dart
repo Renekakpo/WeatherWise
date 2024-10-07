@@ -47,7 +47,7 @@ class WeatherDetailsView extends StatelessWidget {
               _buildWeatherWindItem(
                   convertFromMeterToKilometer(
                           weatherUnit, weatherData.wind.speed)
-                      .toInt(),
+                      .round(),
                   mWidth,
                   headerFont,
                   subHeaderFont)

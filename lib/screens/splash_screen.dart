@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+import 'package:lottie/lottie.dart';
 import 'package:weatherwise/helpers/database_helper.dart';
 import 'package:weatherwise/helpers/shared_preferences_helper.dart';
 
@@ -150,8 +151,11 @@ class _SplashScreenState extends State<SplashScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset('assets/images/splash_cloud_img.png',
-                fit: BoxFit.contain),
+            // Image.asset('assets/images/splash_cloud_img.png',
+            //     fit: BoxFit.contain),
+            Lottie.asset("assets/icons/clouds_animation.json",
+                fit: BoxFit.contain,
+                alignment: Alignment.center),
             const Text(
               "WeatherWise",
               style: TextStyle(

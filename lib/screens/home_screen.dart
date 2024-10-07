@@ -317,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title:
               _buildAppBarTitle(_locationEnabled, _weatherData?.name ?? "-")),
       body: _buildBodyWithRefreshOrNot(),
-      drawer: _buildDrawerContainer(),
+      drawer: SafeArea(child: _buildDrawerContainer(),),
     );
   }
 

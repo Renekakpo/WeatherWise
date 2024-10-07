@@ -24,7 +24,9 @@ void main() async {
     }
   }
 
-  runApp(MyApp(permissionHelper: PermissionHelper(),));
+  runApp(MyApp(
+    permissionHelper: PermissionHelper(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -36,11 +38,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           fontFamily: 'OpenSans',
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
           useMaterial3: true,
         ),
-        home: SafeArea(child: SplashScreen(permissionHelper: permissionHelper ?? PermissionHelper(),)));
+        home: SafeArea(
+            child: SplashScreen(
+          permissionHelper: permissionHelper ?? PermissionHelper(),
+        )));
   }
 }
