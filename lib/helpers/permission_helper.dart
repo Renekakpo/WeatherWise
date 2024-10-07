@@ -3,13 +3,16 @@ import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
 
 class PermissionHelper {
-  static final PermissionHelper _instance = PermissionHelper._internal();
+  static PermissionHelper _instance = PermissionHelper._internal(Location());
 
-  factory PermissionHelper() {
+  factory PermissionHelper({Location? location}) {
+    if (location != null) {
+      _instance = PermissionHelper._internal(location); // Update the instance's _location
+    }
     return _instance;
   }
 
-  PermissionHelper._internal();
+  PermissionHelper._internal(this._location); // Constructor with Location
 
   // Stream controller for permission status changes
   final StreamController<PermissionStatus> _permissionStatusController =
@@ -18,7 +21,7 @@ class PermissionHelper {
   Stream<PermissionStatus> get permissionStatusStream =>
       _permissionStatusController.stream;
 
-  final Location _location = Location();
+   Location _location; // Initialize _location here
 
   Future<bool> isLocationPermissionGranted() async {
     final PermissionStatus status = await _location.hasPermission();

@@ -157,4 +157,43 @@ class WeatherData {
       cod: int.tryParse(json['cod'].toString()) ?? 0,
     );
   }
+
+  // Factory to create a fake instance for testing
+  factory WeatherData.fake() {
+    return WeatherData(
+      coord: Coord(lon: 123.45, lat: 67.89),
+      weather: [
+        Weather(
+          id: 800,
+          main: "Clear",
+          description: "clear sky",
+          icon: "01d",
+        ),
+      ],
+      base: "stations",
+      main: Main(
+        temp: 298.15,
+        feelsLike: 300.15,
+        tempMin: 295.15,
+        tempMax: 301.15,
+        pressure: 1013,
+        humidity: 78,
+        seaLevel: 1013,
+        grndLevel: 1008,
+      ),
+      visibility: 10000,
+      wind: Wind(speed: 5.1, deg: 350, gust: 7.2),
+      clouds: Clouds(all: 1),
+      dt: 1625168000,
+      sys: Sys(
+        country: "US",
+        sunrise: 1625132800,
+        sunset: 1625184400,
+      ),
+      timezone: -14400,
+      id: 5128581,
+      name: "New York",
+      cod: 200,
+    );
+  }
 }

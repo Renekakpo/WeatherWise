@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:lottie/lottie.dart';
-import 'package:weatherwise/utils/wcolors.dart';
 
 import '../helpers/database_helper.dart';
 import '../helpers/shared_preferences_helper.dart';

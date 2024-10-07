@@ -26,6 +26,17 @@ class ForecastData {
       city: City.fromJson(json['city']),
     );
   }
+
+  // Factory to create a fake instance for testing
+  factory ForecastData.fake() {
+    return ForecastData(
+      cod: "200",
+      message: 0,
+      cnt: 5,
+      list: List.generate(5, (index) => ForecastItem.fake()), // Generate 5 forecast items
+      city: City.fake(),
+    );
+  }
 }
 
 class ForecastItem {
@@ -66,6 +77,20 @@ class ForecastItem {
       dtTxt: json['dt_txt'],
     );
   }
+
+  factory ForecastItem.fake() {
+    return ForecastItem(
+      dt: 1628123456, // A sample UNIX timestamp
+      main: Main.fake(),
+      weather: List.generate(1, (index) => Weather.fake()), // Single weather item
+      clouds: Clouds.fake(),
+      wind: Wind.fake(),
+      visibility: 10000, // Visibility in meters
+      pop: 0.75, // Probability of precipitation
+      sys: Sys.fake(),
+      dtTxt: "2024-10-01 12:00:00", // Sample date in "YYYY-MM-DD HH:mm:ss" format
+    );
+  }
 }
 
 class Main {
@@ -104,6 +129,20 @@ class Main {
       tempKf: (json['temp_kf'] ?? 0).toInt(),
     );
   }
+
+  factory Main.fake() {
+    return Main(
+      temp: 298.15, // Temperature in Kelvin
+      feelsLike: 300.15,
+      tempMin: 295.15,
+      tempMax: 303.15,
+      pressure: 1013, // Pressure in hPa
+      seaLevel: 1013,
+      grndLevel: 1008,
+      humidity: 85, // Humidity percentage
+      tempKf: 0,
+    );
+  }
 }
 
 class Weather {
@@ -127,6 +166,15 @@ class Weather {
       icon: json['icon'],
     );
   }
+
+  factory Weather.fake() {
+    return Weather(
+      id: 800,
+      main: "Clear",
+      description: "clear sky",
+      icon: "01d", // Icon code
+    );
+  }
 }
 
 class Clouds {
@@ -138,6 +186,10 @@ class Clouds {
     return Clouds(
       all: json['all'],
     );
+  }
+
+  factory Clouds.fake() {
+    return Clouds(all: 10);
   }
 }
 
@@ -159,6 +211,14 @@ class Wind {
       gust: json['gust'].toDouble(),
     );
   }
+
+  factory Wind.fake() {
+    return Wind(
+      speed: 5.5, // Wind speed in m/s
+      deg: 180, // Wind direction in degrees
+      gust: 7.5, // Wind gust speed
+    );
+  }
 }
 
 class Sys {
@@ -170,6 +230,10 @@ class Sys {
     return Sys(
       pod: json['pod'],
     );
+  }
+
+  factory Sys.fake() {
+    return Sys(pod: "d");
   }
 }
 
@@ -206,6 +270,19 @@ class City {
       sunset: json['sunset'],
     );
   }
+
+  factory City.fake() {
+    return City(
+      id: 12345,
+      name: "Sample City",
+      coord: Coord.fake(),
+      country: "US",
+      population: 500000,
+      timezone: -14400, // Timezone offset in seconds
+      sunrise: 1628053200, // Sample UNIX timestamp for sunrise
+      sunset: 1628103600, // Sample UNIX timestamp for sunset
+    );
+  }
 }
 
 class Coord {
@@ -218,6 +295,13 @@ class Coord {
     return Coord(
       lat: json['lat'],
       lon: json['lon'],
+    );
+  }
+
+  factory Coord.fake() {
+    return Coord(
+      lat: 40.7128, // Latitude for New York, for example
+      lon: -74.0060, // Longitude for New York
     );
   }
 }

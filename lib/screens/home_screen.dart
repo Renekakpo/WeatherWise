@@ -23,82 +23,96 @@ import '../network/weather_api_helper.dart';
 import '../utils/wcolors.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final DatabaseHelper databaseHelper;
+  final AppSharedPreferences preferences;
+  final WeatherApiHelper? weatherApiHelper;
+  final LocationHelper? locationHelper;
+
+  const HomeScreen(
+      {super.key,
+      required this.databaseHelper,
+      required this.preferences,
+      this.weatherApiHelper,
+      this.locationHelper});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final dbHelper = DatabaseHelper();
-  final prefs = AppSharedPreferences();
-  final WeatherApiHelper weatherApiHelper =
-      WeatherApiHelper(dotenv.env['WEATHER_WISE_API_KEY'] ?? "");
+  late WeatherApiHelper weatherApiHelper;
   Position? _currentPosition;
   WeatherData? _weatherData;
   ForecastData? _forecastData;
   bool _locationEnabled = false;
   ManageLocation? _favoriteLocation;
-  late StreamSubscription<ServiceStatus> _serviceSubscription;
+  late StreamSubscription<ServiceStatus> _locationServiceStream;
   bool _weatherUnit = false; // false: Celsius, true: Fahrenheit
   String units = "metric";
-  Widget _body = Center(
-      child: Lottie.asset("assets/icons/loader_animation.json",
-          width: 120.0, height: 120.0));
+  late Widget _body;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
 
-    readFavoriteLocation(); // Fetch favorite location from local database
-    _loadUnits();
-
-    // Listen to location service state: enabled/disabled
-    _serviceSubscription =
-        Geolocator.getServiceStatusStream().listen((event) async {
-      setState(() {
-        _locationEnabled =
-            (event == ServiceStatus.enabled); // Save location service state
-      });
-
-      if (_locationEnabled) {
-        // Display loader
+    try {
+      weatherApiHelper = widget.weatherApiHelper ??
+          WeatherApiHelper(dotenv.env['WEATHER_WISE_API_KEY'] ?? "");
+      _body = _buildLottieLoader();
+      _locationServiceStream =
+          Geolocator.getServiceStatusStream().listen((event) async {
         setState(() {
-          _body = Center(
-              child: Lottie.asset("assets/icons/loader_animation.json",
-                  width: 120.0, height: 120.0));
+          _locationEnabled =
+              (event == ServiceStatus.enabled); // Save location service state
         });
-        // Get current location
-        _currentPosition = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high);
-        if (_currentPosition != null) {
-          _getWeatherDetailsWithCurrentLocation();
-        }
-      } else {
-        if (_favoriteLocation != null) {
+
+        if (_locationEnabled) {
           // Display loader
           setState(() {
-            _body = Center(
-                child: Lottie.asset("assets/icons/loader_animation.json",
-                    width: 120.0, height: 120.0));
+            _body = _buildLottieLoader();
           });
-          _getWeatherDetailsWithFavoriteLocation();
+          // Get current location
+          _currentPosition = await Geolocator.getCurrentPosition(
+              desiredAccuracy: LocationAccuracy.high);
+          if (_currentPosition != null) {
+            _getWeatherDetailsWithCurrentLocation();
+          }
+        } else {
+          if (_favoriteLocation != null) {
+            // Display loader
+            setState(() {
+              _body = _buildLottieLoader();
+            });
+            _getWeatherDetailsWithFavoriteLocation();
+          }
+          _showExplanationDialogForLocationService();
         }
-        _showExplanationDialogForLocationService();
-      }
-    });
+      });
 
-    _initLocationServiceState();
+      readFavoriteLocationFromLocalDatabase();
+      _readWeatherUnitsFromPreferences();
+      _initLocationServiceState();
+    } catch (e) {
+      if (kDebugMode) {
+        print("HomeScreen initState: ${e.toString()}");
+      }
+    }
+  }
+
+  Widget _buildLottieLoader() {
+    return Center(
+        key: const Key('lottie loader'),
+        child: Lottie.asset("assets/icons/loader_animation.json",
+            width: 120.0, height: 120.0));
   }
 
   void _initLocationServiceState() async {
-    _locationEnabled = await LocationHelper().isLocationServiceEnabled();
+    _locationEnabled = await (widget.locationHelper ?? LocationHelper()).isLocationServiceEnabled();
 
     if (_locationEnabled) {
       // Get current location
-      _currentPosition = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      _currentPosition = await (widget.locationHelper ?? LocationHelper()).getCurrentPosition();
 
       _getWeatherDetailsWithCurrentLocation();
     } else if (_favoriteLocation != null) {
@@ -106,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       setState(() {
         _body = const Center(
+          key: Key('Weather details access'),
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
@@ -122,18 +137,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
-    _serviceSubscription.cancel();
+    _locationServiceStream.cancel();
   }
 
-  void _loadUnits() {
-    _weatherUnit = prefs.getWeatherUnit();
+  void _readWeatherUnitsFromPreferences() {
+    _weatherUnit = widget.preferences.getWeatherUnit();
     // Imperial return temp in Fahrenheit and wind speed in miles/h
     // while metric gives temp in Celsius and wind speed in m/s
     units = _weatherUnit ? "imperial" : "metric";
   }
 
-  Future<void> readFavoriteLocation() async {
-    final location = await dbHelper.getLocalFavoriteLocation();
+  Future<void> readFavoriteLocationFromLocalDatabase() async {
+    final location = await widget.databaseHelper.getLocalFavoriteLocation();
     setState(() {
       _favoriteLocation = location;
     });
@@ -239,15 +254,15 @@ class _HomeScreenState extends State<HomeScreen> {
         MaterialPageRoute(builder: (context) => const SettingsScreen()));
 
     if (res == true) {
-      readFavoriteLocation(); // Fetch favorite location from local database
-      _loadUnits(); // Read updated units
+      readFavoriteLocationFromLocalDatabase(); // Fetch favorite location from local database
+      _readWeatherUnitsFromPreferences(); // Read updated units
       _getWeatherDetailsWithCurrentLocation(); // Fetch weather data with modified units
-      if (!prefs.getAppAutoRefreshOnGoSetting()) {
+      if (!widget.preferences.getAppAutoRefreshOnGoSetting()) {
         startWeatherDataFetch(); // Update timer with new values
       }
       // Add pull down to refresh to body if enable from settings
-      if (prefs.getAppAutoRefreshOnGoSetting()) {
-        _buildBodyWithRefresh();
+      if (widget.preferences.getAppAutoRefreshOnGoSetting()) {
+        _buildBodyWithRefreshOrNot();
       }
     }
   }
@@ -259,8 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (res == true) {
-      readFavoriteLocation(); // Fetch favorite location from local database
-      _loadUnits();
+      readFavoriteLocationFromLocalDatabase(); // Fetch favorite location from local database
+      _readWeatherUnitsFromPreferences();
     }
   }
 
@@ -274,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Start the timer based on the user's selected interval
   Future<void> startWeatherDataFetch() async {
-    int intervalInHours = prefs.getAppAutoRefreshSetting();
+    int intervalInHours = widget.preferences.getAppAutoRefreshSetting();
 
     // Cancel the previous timer if it exists
     _timer?.cancel();
@@ -301,14 +316,14 @@ class _HomeScreenState extends State<HomeScreen> {
           iconTheme: const IconThemeData(color: Colors.white),
           title:
               _buildAppBarTitle(_locationEnabled, _weatherData?.name ?? "-")),
-      body: _buildBodyWithRefresh(),
+      body: _buildBodyWithRefreshOrNot(),
       drawer: _buildDrawerContainer(),
     );
   }
 
-  Widget _buildBodyWithRefresh() {
+  Widget _buildBodyWithRefreshOrNot() {
     // If the auto-refresh setting is enabled, use the RefreshIndicator.
-    if (prefs.getAppAutoRefreshOnGoSetting()) {
+    if (widget.preferences.getAppAutoRefreshOnGoSetting()) {
       return RefreshIndicator(
         onRefresh: _onPullRefresh,
         child: _body,
@@ -325,7 +340,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Weather data refreshed successfully')),
+            const SnackBar(
+                content: Text('Weather data refreshed successfully')),
           );
         }
       } catch (e) {

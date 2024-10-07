@@ -8,7 +8,8 @@ String formatDateTime(DateTime dateTime) {
 }
 
 String getDayNameFromTimestamp(int timestamp) {
-  DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000).toLocal();
+  DateTime date =
+      DateTime.fromMillisecondsSinceEpoch(timestamp * 1000).toLocal();
   // Format the date to get the day name
   String dayName = DateFormat('EEEE').format(date);
   return dayName;
@@ -16,7 +17,8 @@ String getDayNameFromTimestamp(int timestamp) {
 
 String formatTimestampToHour(int timestamp) {
   // Create a DateTime object from the timestamp
-  DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000).toLocal();
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(timestamp * 1000).toLocal();
 
   // Check if the minutes are zero
   if (dateTime.minute == 0) {
@@ -31,7 +33,7 @@ String formatTimestampToHour(int timestamp) {
 String iconPathFromWeatherType(String type) {
   String iconPath = "assets/vectors/icons/";
 
-  switch(type.toLowerCase()) {
+  switch (type.toLowerCase()) {
     case "cloudy":
       iconPath += "cloudy.svg";
       break;
@@ -58,7 +60,7 @@ String iconPathFromWeatherType(String type) {
 IconData iconDataFromWeatherType(String type) {
   IconData iconData;
 
-  switch(type.toLowerCase()) {
+  switch (type.toLowerCase()) {
     case "cloudy":
       iconData = Icons.wb_cloudy;
       break;
@@ -82,13 +84,21 @@ IconData iconDataFromWeatherType(String type) {
   return iconData;
 }
 
-Future myLoadAsset(String path) async {
+Future<String?> myLoadAsset(String path, {AssetBundle? assetBundle}) async {
   try {
     // Load the asset bundle
-    AssetBundle bundle = rootBundle;
+    AssetBundle bundle;
+    if (assetBundle != null) {
+      bundle = assetBundle;
+    } else {
+      bundle = rootBundle;
+    }
 
     // Check if the asset exists
-    bool exists = await bundle.load(path).then((value) => true).catchError((error) => false);
+    bool exists = await bundle
+        .load(path)
+        .then((value) => true)
+        .catchError((error) => false);
 
     // If asset exists, return the path
     if (exists) {
@@ -124,14 +134,17 @@ String getWeatherDescription(double temperature) {
 
 double convertFromMeterToKilometer(bool isWeatherUnit, double windSpeed) {
   try {
-    if (!isWeatherUnit) { // When isWeatherUnit false(Celsius), unit is metric and wind speed in meters per second
+    if (!isWeatherUnit) {
+      // When isWeatherUnit false(Celsius), unit is metric and wind speed in meters per second
       // Convert wind speed from meters per second to kilometers per hour
       return windSpeed * 3.6;
-    } else { // When isWeatherUnit true(Fahrenheit), unit is imperial and wind speed in miles per second
+    } else {
+      // When isWeatherUnit true(Fahrenheit), unit is imperial and wind speed in miles per second
       // Convert wind speed from miles per second to kilo miles per hour
-      return (windSpeed * 3600) / 1000; // 3600 to convert seconds to hours, then divide by 1000 for kilo miles
+      return (windSpeed * 3600) /
+          1000; // 3600 to convert seconds to hours, then divide by 1000 for kilo miles
     }
-  } catch(e) {
+  } catch (e) {
     if (kDebugMode) {
       print(e);
     }

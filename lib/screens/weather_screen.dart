@@ -1,17 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:weatherwise/helpers/shared_preferences_helper.dart';
 import 'package:weatherwise/helpers/utils_helper.dart';
 import 'package:weatherwise/models/forecast_data.dart';
 import 'package:weatherwise/models/weather_data.dart';
 import 'package:weatherwise/utils/wcolors.dart';
-import 'package:weatherwise/widgets/forecast_tips_card.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 import '../helpers/notification_helper.dart';
 import '../widgets/forecast_card.dart';
-import '../widgets/forecast_data_item.dart';
 import '../widgets/weather_details_view.dart';
 
 class WeatherScreen extends StatefulWidget {
@@ -29,8 +27,9 @@ class _WeatherScreenState extends State<WeatherScreen> {
   var backgroundColor = Colors.blueGrey;
   String weatherUnit = AppSharedPreferences().getWeatherUnit() ? "ºF" : "ºC";
   String notificationBody = "";
+  late String weatherIconUrl;
 
-  Future<void> showWeatherUpdate(
+  Future<void> displayWeatherNotification(
       String title, String body, String iconUrl) async {
     if (await Permission.notification.isGranted) {
       NotificationHelper().showWeatherNotification(
@@ -51,29 +50,29 @@ class _WeatherScreenState extends State<WeatherScreen> {
   void initState() {
     super.initState();
 
-    final title = widget.weatherData.name; // City name
+    final nameOfCity = widget.weatherData.name;
     final body =
         'Today feels like ${widget.weatherData.main.feelsLike.round()}$weatherUnit.\n${getWeatherDescription(widget.weatherData.main.feelsLike)}';
-    final iconUrl =
+    weatherIconUrl =
         "https://openweathermap.org/img/wn/${widget.weatherData.weather.first.icon}@2x.png";
 
-    showWeatherUpdate(title, body, iconUrl);
+    displayWeatherNotification(nameOfCity, body, weatherIconUrl);
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(child: Container(
-          color: WColors.blueGray500 /*const Color(0xFFF8FAFD)*/,
+          color: WColors.blueGray500,
           padding: const EdgeInsets.only(bottom: 10.0),
           // color: backgroundColor,
           width: MediaQuery.of(context).size.width,
           child: Column(
             children: [
-              _buildMainWeather(context, widget.weatherData),
+              _buildMainWeather(context, widget.weatherData, weatherIconUrl),
               const SizedBox(
                 height: 20.0,
               ),
-              ForecastCard(forecastItems: groupByDt(widget.forecastData.list)),
+              ForecastCard(key: const Key('ForecastCard'), forecastItems: groupByDt(widget.forecastData.list)),
               const SizedBox(
                 height: 20.0,
               ),
@@ -86,14 +85,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
           ),
         ));
   }
-
-
 }
 
-Widget _buildMainWeather(BuildContext context, WeatherData weatherData) {
+Widget _buildMainWeather(BuildContext context, WeatherData weatherData, iconUrl) {
   double mSize = MediaQuery.of(context).size.width;
-  String iconId = weatherData.weather.first.icon;
-  String weatherIconUrl = "https://openweathermap.org/img/wn/$iconId@2x.png";
 
   return Container(
     width: mSize,
@@ -121,6 +116,7 @@ Widget _buildMainWeather(BuildContext context, WeatherData weatherData) {
           children: [
             Text(
               "${weatherData.main.temp.round()}º",
+              key: const Key('main_temperature'),
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 60.0,
@@ -128,6 +124,7 @@ Widget _buildMainWeather(BuildContext context, WeatherData weatherData) {
             ),
             Text(
               weatherData.weather.first.main,
+              key: const Key('main_condition'),
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14.0,
@@ -138,6 +135,7 @@ Widget _buildMainWeather(BuildContext context, WeatherData weatherData) {
             ),
             Text(
               "${weatherData.main.tempMax.round()}º / ${weatherData.main.tempMin.round()}º Feels like ${weatherData.main.feelsLike.round()}º",
+              key: const Key('min_and_max_temperature'),
               style: const TextStyle(
                   color: Colors.white,
                   fontSize: 12,
@@ -146,7 +144,7 @@ Widget _buildMainWeather(BuildContext context, WeatherData weatherData) {
           ],
         ),
         const Expanded(child: SizedBox()),
-        Image.network(weatherIconUrl)
+        Image.network(iconUrl)
       ],
     ),
   );
@@ -185,6 +183,7 @@ Widget _buildSunStateWidget(BuildContext context, WeatherData weatherData) {
                   fontWeight: FontWeight.w500,
                 )),
             Lottie.asset("assets/icons/sunrise.json",
+                key: const Key('sunrise_animation_icon'),
                 width: mSize * 0.25,
                 height: mSize * 0.25,
                 fit: BoxFit.cover,
@@ -202,6 +201,7 @@ Widget _buildSunStateWidget(BuildContext context, WeatherData weatherData) {
                   fontWeight: FontWeight.w500,
                 )),
             Lottie.asset("assets/icons/sunset.json",
+                key: const Key('sunset_animation_icon'),
                 width: mSize * 0.25,
                 height: mSize * 0.25,
                 fit: BoxFit.fill,

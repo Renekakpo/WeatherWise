@@ -5,7 +5,11 @@ class AppSharedPreferences {
 
   static final AppSharedPreferences _instance = AppSharedPreferences._internal();
 
-  factory AppSharedPreferences() {
+  factory AppSharedPreferences({SharedPreferences? prefs}) {
+    if (prefs != null) {
+      _instance._prefs = prefs;
+    }
+
     return _instance;
   }
 
@@ -19,8 +23,8 @@ class AppSharedPreferences {
     return _prefs.getBool('weather_unit') ?? false;
   }
 
-  void setWeatherUnit(bool value) {
-    _prefs.setBool('weather_unit', value);
+  Future<void> setWeatherUnit(bool value) async {
+    await _prefs.setBool('weather_unit', value);
   }
 
   int getAppAutoRefreshSetting() {

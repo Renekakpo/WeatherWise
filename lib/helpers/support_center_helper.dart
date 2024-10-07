@@ -1,21 +1,34 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:logger/logger.dart';
 import 'package:mailer/mailer.dart';
 
+import '../adapter/flutter_email_sender_adapter.dart';
+import '../interface/email_sender.dart';
+
 class SupportCenterHelper {
   static final SupportCenterHelper _instance = SupportCenterHelper._internal();
 
-  factory SupportCenterHelper() {
+  factory SupportCenterHelper({EmailSender? emailSender, Logger? logger}) {
+    if (emailSender != null) {
+      _instance._emailSender = emailSender;
+    }
+
+    if (logger != null) {
+      _instance._logger = logger; // Use the injected logger
+    }
+
     return _instance;
   }
 
   SupportCenterHelper._internal();
 
-  final Logger _logger = Logger();
+  late Logger _logger = Logger();
 
   late final String _supportEmail;
+
+  EmailSender _emailSender =
+      FlutterEmailSenderAdapter(); // Default implementation
 
   void initialize() {
     _supportEmail = dotenv.env['SUPPORT_EMAIL'] ?? '';
@@ -25,8 +38,8 @@ class SupportCenterHelper {
     }
   }
 
-  Future<void> sendSupportEmail(String userEmail, String issueDescription, BuildContext context) async {
-
+  Future<bool> sendSupportEmail(
+      String userEmail, String issueDescription) async {
     final Email email = Email(
       body: 'Issue Description:\n$issueDescription',
       subject: 'Wrong Location Report',
@@ -35,16 +48,12 @@ class SupportCenterHelper {
     );
 
     try {
-      await FlutterEmailSender.send(email);
+      final res = await _emailSender.send(email);
       _logger.i('Message sent: success');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Report sent successfully!')),
-      );
+      return res;
     } on MailerException catch (e) {
       _logger.e('Message not sent. ${e.toString()}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send report. Please try again.')),
-      );
+      return false;
     }
   }
 }

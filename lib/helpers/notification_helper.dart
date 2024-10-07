@@ -4,19 +4,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NotificationHelper {
   static final NotificationHelper _instance = NotificationHelper._internal();
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
+  final http.Client _httpClient;
 
-  factory NotificationHelper() => _instance;
+  factory NotificationHelper({http.Client? httpClient, FlutterLocalNotificationsPlugin? flutterPlugin}) => _instance;
 
-  NotificationHelper._internal();
-
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+  NotificationHelper._internal({http.Client? httpClient, FlutterLocalNotificationsPlugin? flutterPlugin})
+      : _flutterLocalNotificationsPlugin = flutterPlugin ?? FlutterLocalNotificationsPlugin(),
+        _httpClient = httpClient ?? http.Client();
 
   Future<void> initialize(BuildContext context) async {
     const AndroidInitializationSettings initializationSettingsAndroid =
@@ -61,7 +63,7 @@ class NotificationHelper {
     required String weatherIconUrl,
     required int notificationId,
   }) async {
-    final ByteData? iconData = await _downloadAndConvertToBytes(weatherIconUrl);
+    final ByteData? iconData = await downloadAndConvertToBytes(weatherIconUrl);
     if (iconData == null) {
       if (kDebugMode) {
         print('Failed to download weather icon');
@@ -103,7 +105,7 @@ class NotificationHelper {
     );
   }
 
-  Future<ByteData?> _downloadAndConvertToBytes(String url) async {
+  Future<ByteData?> downloadAndConvertToBytes(String url) async {
     try {
       final Response response = await get(Uri.parse(url));
       if (response.statusCode == 200) {

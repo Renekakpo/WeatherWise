@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:weatherwise/widgets/custom_input_field.dart';
 
@@ -22,21 +23,36 @@ class _ReportWrongLocationScreenState extends State<ReportWrongLocationScreen> {
     Navigator.pop(context);
   }
 
-  void _onSubmitPressed(BuildContext context) {
+  void _onSubmitPressed(BuildContext context) async {
     try {
       if (_formKey.currentState!.validate()) {
-        print("Form validate. Submit!");
+        if (kDebugMode) {
+          print("Form validate. Submit!");
+        }
         final String email = _email;
         final String issueDescription = _issueDescription;
 
         // Use the SupportCenterHelper singleton to send the email
-        SupportCenterHelper()
-            .sendSupportEmail(email, issueDescription, context);
+        final emailSent = await SupportCenterHelper()
+            .sendSupportEmail(email, issueDescription);
+        if (emailSent) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Report sent successfully!')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to send report. Please try again.')),
+          );
+        }
       } else {
-        print("Form not validate.");
+        if (kDebugMode) {
+          print("Form not validate.");
+        }
       }
     } catch (e) {
-      print("Error: $e");
+      if (kDebugMode) {
+        print("Error: $e");
+      }
     }
   }
 
@@ -77,14 +93,14 @@ class _ReportWrongLocationScreenState extends State<ReportWrongLocationScreen> {
                     height: 30.0,
                   ),
                   const Text(Strings.supportCenterLabel,
-                      style:
-                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontSize: 20.0, fontWeight: FontWeight.bold)),
                   const SizedBox(
                     height: 5.0,
                   ),
                   const Text(Strings.supportCenterSubHeader,
-                      style:
-                      TextStyle(fontSize: 15.0, fontWeight: FontWeight.w400)),
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.w400)),
                   const SizedBox(
                     height: 25.0,
                   ),
