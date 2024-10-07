@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:weatherwise/models/weather_data.dart';
 import 'package:weatherwise/utils/strings.dart';
 
+import '../helpers/shared_preferences_helper.dart';
+import '../helpers/utils_helper.dart';
+import '../utils/wcolors.dart';
+
 class WeatherDetailsView extends StatelessWidget {
   final WeatherData weatherData;
 
@@ -10,6 +14,7 @@ class WeatherDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double mWidth = MediaQuery.of(context).size.width;
+    bool weatherUnit = AppSharedPreferences().getWeatherUnit();
     const headerFont = TextStyle(
         fontWeight: FontWeight.bold, fontSize: 16.0, color: Colors.white);
     const subHeaderFont = TextStyle(
@@ -23,7 +28,7 @@ class WeatherDetailsView extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0),
-          color: Colors.white,
+          color: WColors.blueGray300,
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.3),
@@ -36,9 +41,16 @@ class WeatherDetailsView extends StatelessWidget {
         child: Column(children: [
           Row(
             children: [
-              _buildWeatherTempItem(weatherData.main.temp.toInt(), mWidth, headerFont, subHeaderFont),
+              _buildWeatherTempItem(weatherData.main.temp.toInt(), mWidth,
+                  headerFont, subHeaderFont),
               const Expanded(child: SizedBox()),
-              _buildWeatherWindItem((weatherData.wind.speed*3.6).toInt(), mWidth, headerFont, subHeaderFont)
+              _buildWeatherWindItem(
+                  convertFromMeterToKilometer(
+                          weatherUnit, weatherData.wind.speed)
+                      .round(),
+                  mWidth,
+                  headerFont,
+                  subHeaderFont)
             ],
           ),
           const SizedBox(
@@ -46,34 +58,46 @@ class WeatherDetailsView extends StatelessWidget {
           ),
           Row(
             children: [
-              _buildWeatherUVIndexItem(weatherData.main.pressure, mWidth, headerFont, subHeaderFont),
+              _buildWeatherUVIndexItem(
+                  weatherData.main.pressure, mWidth, headerFont, subHeaderFont),
               const Expanded(child: SizedBox()),
-              _buildWeatherHumidityItem(weatherData.main.humidity, mWidth, headerFont, subHeaderFont)
+              _buildWeatherHumidityItem(
+                  weatherData.main.humidity, mWidth, headerFont, subHeaderFont)
             ],
           )
         ]));
   }
 
-  Widget _buildWeatherTempItem(int temp, double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
+  Widget _buildWeatherTempItem(
+      int temp, double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
       height: mWidth * 0.2,
       padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.5),
+          color: WColors.blueGray200,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset("assets/images/weather_temp.png", width: mWidth * 0.1, height: mWidth * 0.1),
+          Image.asset(
+            "assets/images/weather_temp.png",
+            width: mWidth * 0.1,
+            height: mWidth * 0.1,
+            color: Colors.white,
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("$tempº", style: headerFont),
-              Text(Strings.celsius, style: subHeaderFont)
+              Text(
+                  AppSharedPreferences().getWeatherUnit()
+                      ? Strings.fahrenheit
+                      : Strings.celsius,
+                  style: subHeaderFont)
             ],
           )
         ],
@@ -81,26 +105,31 @@ class WeatherDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherWindItem(int windSpeed,
-      double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
+  Widget _buildWeatherWindItem(int windSpeed, double mWidth,
+      TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
       height: mWidth * 0.2,
       padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.5),
+          color: WColors.blueGray200,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset("assets/images/weather_wind.png", width: mWidth * 0.1, height: mWidth * 0.1),
+          Image.asset(
+            "assets/images/weather_wind.png",
+            width: mWidth * 0.1,
+            height: mWidth * 0.1,
+            color: Colors.white,
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("$windSpeed km/h", style: headerFont),
+              Text(AppSharedPreferences().getWeatherUnit() ? "$windSpeed kmiles/h" : "$windSpeed km/h", style: headerFont),
               Text("Wind", style: subHeaderFont)
             ],
           )
@@ -109,22 +138,26 @@ class WeatherDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherUVIndexItem(int pressure,
-      double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
+  Widget _buildWeatherUVIndexItem(int pressure, double mWidth,
+      TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
       height: mWidth * 0.2,
       padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.5),
+          color: WColors.blueGray200,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset('assets/images/weather_pressure.png',
-              width: mWidth * 0.1, height: mWidth * 0.1),
+          Image.asset(
+            'assets/images/weather_pressure.png',
+            width: mWidth * 0.1,
+            height: mWidth * 0.1,
+            color: Colors.white,
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,22 +171,26 @@ class WeatherDetailsView extends StatelessWidget {
     );
   }
 
-  Widget _buildWeatherHumidityItem(int humidity,
-      double mWidth, TextStyle headerFont, TextStyle subHeaderFont) {
+  Widget _buildWeatherHumidityItem(int humidity, double mWidth,
+      TextStyle headerFont, TextStyle subHeaderFont) {
     return Container(
       width: mWidth * 0.4,
       height: mWidth * 0.2,
       padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 10.0),
       decoration: BoxDecoration(
-          color: Colors.grey.withOpacity(0.5),
+          color: WColors.blueGray200,
           shape: BoxShape.rectangle,
           borderRadius: BorderRadius.circular(10.0)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Image.asset("assets/images/weather_humidity.png",
-              width: mWidth * 0.08, height: mWidth * 0.08,),
+          Image.asset(
+            "assets/images/weather_humidity.png",
+            width: mWidth * 0.08,
+            height: mWidth * 0.08,
+            color: Colors.white,
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,

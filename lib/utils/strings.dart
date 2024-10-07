@@ -8,8 +8,8 @@ class Strings {
 
   static const String unitsLabel = "Units";
   static const String weatherUnitLabel = "Weather";
-  static const String weatherUnitCelsiusLabel = "C";
-  static const String weatherUnitFahrenheitLabel = "F";
+  static const String weatherUnitCelsiusLabel = "ºC";
+  static const String weatherUnitFahrenheitLabel = "ºF";
   static const String windUnitLabel = "Wind";
   static const String windUnitMileLabel = "Mil";
   static const String windUnitKiloLabel = "Km";
@@ -29,6 +29,7 @@ class Strings {
   static const String favouriteLocationDesc =
       "Your favourite location will be used to provide weather information in notifications and other connected services. You can change your favorite location in your location list.";
   static const String celsius = "Celsius";
+  static const String fahrenheit = "Fahrenheit";
   static const String openSource = "Open source licences";
   static const String contentToShare = "Check out WeatherWise, a comprehensive weather forecasting application built using Flutter. It provides up-to-date weather information for your location and any other locations you are interested in!";
   static const String wrongLocationLabel = "Report wrong location";

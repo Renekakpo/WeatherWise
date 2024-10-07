@@ -12,6 +12,8 @@ import 'package:weatherwise/utils/strings.dart';
 import 'package:weatherwise/widgets/custom_radio_button.dart';
 import 'package:weatherwise/widgets/custom_switch_with_text.dart';
 
+import '../utils/wcolors.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -22,7 +24,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen>
     with SingleTickerProviderStateMixin {
   bool _weatherUnit = false; // Default value
-  bool _windUnit = false; // Default value
   bool _refreshOnTheGo = false;
   int _autoRefreshSelectedOption = 0; // Default value
 
@@ -36,13 +37,12 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _onBackArrowPressed() {
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   Future<void> _loadUnitsOptions() async {
     setState(() {
       _weatherUnit = AppSharedPreferences().getWeatherUnit();
-      _windUnit = AppSharedPreferences().getWindUnit();
     });
   }
 
@@ -73,14 +73,6 @@ class _SettingsScreenState extends State<SettingsScreen>
     });
   }
 
-  void _onWindUnitChanged(bool updatedValue) async {
-    setState(() {
-      _windUnit = updatedValue;
-      AppSharedPreferences()
-          .setWindUnit(updatedValue); // false: Miles, true: Kilometer
-    });
-  }
-
   void _onShowAutoRefreshOptionsSheet() {
     showModalBottomSheet<void>(
         context: context,
@@ -89,76 +81,79 @@ class _SettingsScreenState extends State<SettingsScreen>
           return Container(
             width: MediaQuery.of(context).size.width,
             padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                const Text(Strings.appAutoRefreshLabel,
-                    style: TextStyle(
-                        fontFamily: 'Roboto',
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w500)),
-                CustomRadioButton(
-                  title: Strings.neverLabel,
-                  value: 0,
-                  groupValue: _autoRefreshSelectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _autoRefreshSelectedOption = value!;
-                      _saveAutoRefreshSelectedOption(value);
-                    });
-                  },
-                ),
-                CustomRadioButton(
-                    title: Strings.everyHourLabel,
-                    value: 1,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  const Text(Strings.appAutoRefreshLabel,
+                      style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w500)),
+                  CustomRadioButton(
+                    title: Strings.neverLabel,
+                    value: 0,
                     groupValue: _autoRefreshSelectedOption,
                     onChanged: (value) {
                       setState(() {
                         _autoRefreshSelectedOption = value!;
                         _saveAutoRefreshSelectedOption(value);
                       });
-                    }),
-                CustomRadioButton(
-                    title: Strings.everyThreeHourLabel,
-                    value: 3,
-                    groupValue: _autoRefreshSelectedOption,
-                    onChanged: (value) {
-                      setState(() {
-                        _autoRefreshSelectedOption = value!;
-                        _saveAutoRefreshSelectedOption(value);
-                      });
-                    }),
-                CustomRadioButton(
-                    title: Strings.everySixHourLabel,
-                    value: 6,
-                    groupValue: _autoRefreshSelectedOption,
-                    onChanged: (value) {
-                      setState(() {
-                        _autoRefreshSelectedOption = value!;
-                        _saveAutoRefreshSelectedOption(value);
-                      });
-                    }),
-                CustomRadioButton(
-                    title: Strings.everyTwelveHourLabel,
-                    value: 12,
-                    groupValue: _autoRefreshSelectedOption,
-                    onChanged: (value) {
-                      setState(() {
-                        _autoRefreshSelectedOption = value!;
-                        _saveAutoRefreshSelectedOption(value);
-                      });
-                    }),
-                CustomRadioButton(
-                    title: Strings.everyTwentyFourHourLabel,
-                    value: 24,
-                    groupValue: _autoRefreshSelectedOption,
-                    onChanged: (value) {
-                      setState(() {
-                        _autoRefreshSelectedOption = value!;
-                        _saveAutoRefreshSelectedOption(value);
-                      });
-                    })
-              ],
-            ),
+                    },
+                  ),
+                  CustomRadioButton(
+                      title: Strings.everyHourLabel,
+                      value: 1,
+                      groupValue: _autoRefreshSelectedOption,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoRefreshSelectedOption = value!;
+                          _saveAutoRefreshSelectedOption(value);
+                        });
+                      }),
+                  CustomRadioButton(
+                      title: Strings.everyThreeHourLabel,
+                      value: 3,
+                      groupValue: _autoRefreshSelectedOption,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoRefreshSelectedOption = value!;
+                          _saveAutoRefreshSelectedOption(value);
+                        });
+                      }),
+                  CustomRadioButton(
+                      title: Strings.everySixHourLabel,
+                      value: 6,
+                      groupValue: _autoRefreshSelectedOption,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoRefreshSelectedOption = value!;
+                          _saveAutoRefreshSelectedOption(value);
+                        });
+                      }),
+                  CustomRadioButton(
+                      title: Strings.everyTwelveHourLabel,
+                      value: 12,
+                      groupValue: _autoRefreshSelectedOption,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoRefreshSelectedOption = value!;
+                          _saveAutoRefreshSelectedOption(value);
+                        });
+                      }),
+                  CustomRadioButton(
+                      title: Strings.everyTwentyFourHourLabel,
+                      value: 24,
+                      groupValue: _autoRefreshSelectedOption,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoRefreshSelectedOption = value!;
+                          _saveAutoRefreshSelectedOption(value);
+                        });
+                      })
+                ],
+              ),
+            )
           );
         });
   }
@@ -239,8 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                 borderRadius: BorderRadius.circular(20),
                                 color: Colors.grey.shade300.withOpacity(0.5)),
                             child: const Center(
-                              child: Expanded(
-                                  child: Text(
+                              child: Text(
                                 Strings.openSource,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -248,7 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                                     color: Colors.black,
                                     fontSize: 18.0,
                                     fontWeight: FontWeight.w500),
-                              )),
+                              ),
                             ),
                           ))),
                 ),
@@ -286,319 +280,307 @@ class _SettingsScreenState extends State<SettingsScreen>
                 fontWeight: FontWeight.w700)),
       ), // AppBar
       body: Container(
-        // Body
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-        color: const Color(0xFFF8FAFD),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              Strings.unitsLabel,
-              style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                      offset: const Offset(0, 3), // changes position of shadow
-                    )
-                  ]),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    // Weather Unit
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Body
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+          color: const Color(0xFFF8FAFD),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  Strings.unitsLabel,
+                  style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w600),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        )
+                      ]),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(Strings.weatherUnitLabel,
-                          style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.w500)),
-                      CustomSwitchWithText(
-                        activeText: Strings.weatherUnitFahrenheitLabel,
-                        inactiveText: Strings.weatherUnitCelsiusLabel,
-                        unitValue: _weatherUnit,
-                        onUnitChanged: _onWeatherUnitChanged,
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  Row(
-                    // Wind Unit
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(Strings.windUnitLabel,
-                          style: TextStyle(
-                              fontFamily: 'Roboto',
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.w500)),
-                      CustomSwitchWithText(
-                        activeText: Strings.windUnitKiloLabel,
-                        inactiveText: Strings.windUnitMileLabel,
-                        unitValue: _windUnit,
-                        onUnitChanged: _onWindUnitChanged,
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 30.0,
-            ),
-            const Text(
-              Strings.appLabel,
-              style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.w600),
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2.0,
-                      blurRadius: 10.0,
-                      offset: const Offset(0, 3), // changes position of shadow
-                    )
-                  ]),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Material(
-                    // Auto refresh
-                    color: Colors.transparent,
-                    child: InkWell(
-                        onTap: _onShowAutoRefreshOptionsSheet,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(5.0),
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.refresh_circled,
-                                  size: 20.0,
-                                ),
-                                SizedBox(
-                                  width: 15.0,
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    Strings.appAutoRefreshLabel,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                        fontFamily: 'Roboto', fontSize: 17.0),
-                                  ),
-                                )
-                              ],
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 8.0,
-                  ),
-                  Container(
-                      // Auto refresh on the go
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(5.0),
-                      child: Row(
+                      Row(
+                        // Weather Unit
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Icon(
-                            CupertinoIcons.refresh_circled,
-                            size: 20.0,
-                          ),
-                          const SizedBox(
-                            width: 15.0,
-                          ),
-                          const Expanded(
-                              child: Text(
-                            Strings.appAutoRefreshOnTheGoLabel,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 17.0),
-                          )),
-                          Switch(
-                              activeColor: Colors.blue,
-                              value: _refreshOnTheGo,
-                              onChanged: _onRefreshOnTheGo)
+                          const Text(Strings.weatherUnitLabel,
+                              style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.w500)),
+                          CustomSwitchWithText(
+                            key: const Key('weather_units_label'),
+                            activeText: Strings.weatherUnitFahrenheitLabel,
+                            inactiveText: Strings.weatherUnitCelsiusLabel,
+                            unitValue: _weatherUnit,
+                            onUnitChanged: _onWeatherUnitChanged,
+                          )
                         ],
-                      )),
-                  const SizedBox(
-                    height: 8.0,
+                      ),
+                    ],
                   ),
-                  Material(
-                    // Notification
-                    color: Colors.transparent,
-                    child: InkWell(
-                        onTap: _onNotificationsTapped,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(5.0),
-                            child: const Row(children: [
-                              Icon(
-                                Icons.notifications_outlined,
+                ),
+                const SizedBox(
+                  height: 30.0,
+                ),
+                const Text(
+                  Strings.appLabel,
+                  style: TextStyle(
+                      fontFamily: 'Roboto',
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w600),
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2.0,
+                          blurRadius: 10.0,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        )
+                      ]),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Material(
+                        // Auto refresh
+                        color: Colors.transparent,
+                        child: InkWell(
+                            key: const Key('auto_refresh_item'),
+                            onTap: _onShowAutoRefreshOptionsSheet,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(5.0),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      CupertinoIcons.refresh_circled,
+                                      size: 20.0,
+                                    ),
+                                    SizedBox(
+                                      width: 15.0,
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        Strings.appAutoRefreshLabel,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            fontFamily: 'Roboto',
+                                            fontSize: 17.0),
+                                      ),
+                                    )
+                                  ],
+                                ))),
+                      ),
+                      const SizedBox(
+                        height: 8.0,
+                      ),
+                      Container(
+                          // Auto refresh on the go
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(5.0),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                CupertinoIcons.refresh_circled,
                                 size: 20.0,
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 15.0,
                               ),
-                              Text(
-                                Strings.appNotificationsLabel,
+                              const Expanded(
+                                  child: Text(
+                                Strings.appAutoRefreshOnTheGoLabel,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(fontSize: 17.0),
-                              )
-                            ]))),
+                              )),
+                              Switch(
+                                  activeColor: WColors.blueGray500,
+                                  value: _refreshOnTheGo,
+                                  onChanged: _onRefreshOnTheGo)
+                            ],
+                          )),
+                      const SizedBox(
+                        height: 8.0,
+                      ),
+                      Material(
+                        // Notification
+                        color: Colors.transparent,
+                        child: InkWell(
+                            onTap: _onNotificationsTapped,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(5.0),
+                                child: const Row(children: [
+                                  Icon(
+                                    Icons.notifications_outlined,
+                                    size: 20.0,
+                                  ),
+                                  SizedBox(
+                                    width: 15.0,
+                                  ),
+                                  Text(
+                                    Strings.appNotificationsLabel,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 17.0),
+                                  )
+                                ]))),
+                      ),
+                      const SizedBox(
+                        height: 15.0,
+                      ),
+                      Material(
+                        // Share
+                        color: Colors.transparent,
+                        child: InkWell(
+                            onTap: _onShareTapped,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(5.0),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      CupertinoIcons.share,
+                                      size: 20.0,
+                                    ),
+                                    SizedBox(
+                                      width: 15.0,
+                                    ),
+                                    Text(
+                                      Strings.appShareLabel,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 17.0),
+                                    )
+                                  ],
+                                ))),
+                      ),
+                      const SizedBox(
+                        height: 15.0,
+                      ),
+                      Material(
+                        // About
+                        color: Colors.transparent,
+                        child: InkWell(
+                            onTap: _onAboutTapped,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(5.0),
+                                child: const Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline_rounded,
+                                      size: 20.0,
+                                    ),
+                                    SizedBox(
+                                      width: 15.0,
+                                    ),
+                                    Text(
+                                      Strings.appAboutLabel,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 17.0),
+                                    )
+                                  ],
+                                ))),
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                    ],
                   ),
-                  const SizedBox(
-                    height: 15.0,
-                  ),
-                  Material(
-                    // Share
-                    color: Colors.transparent,
-                    child: InkWell(
-                        onTap: _onShareTapped,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(5.0),
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  CupertinoIcons.share,
-                                  size: 20.0,
-                                ),
-                                SizedBox(
-                                  width: 15.0,
-                                ),
-                                Text(
-                                  Strings.appShareLabel,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 17.0),
-                                )
-                              ],
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 15.0,
-                  ),
-                  Material(
-                    // About
-                    color: Colors.transparent,
-                    child: InkWell(
-                        onTap: _onAboutTapped,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(5.0),
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.info_outline_rounded,
-                                  size: 20.0,
-                                ),
-                                SizedBox(
-                                  width: 15.0,
-                                ),
-                                Text(
-                                  Strings.appAboutLabel,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 17.0),
-                                )
-                              ],
-                            ))),
-                  ),
-                  const SizedBox(
-                    height: 10.0,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 30.0,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 10,
-                      offset: const Offset(0, 3), // changes position of shadow
-                    )
-                  ]),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Material(
-                    // Review
-                    color: Colors.transparent,
-                    child: InkWell(
-                        onTap: _onReviewTapped,
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 10.0),
-                          child: const Text(
-                            "Review",
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 17.0),
-                          ),
-                        )),
-                  ),
-                  const SizedBox(
-                    height: 15.0,
-                  ),
-                  Material(
-                      // Feedback
-                      color: Colors.transparent,
-                      child: InkWell(
-                          onTap: _onFeedbackTapped,
-                          borderRadius: BorderRadius.circular(5.0),
-                          child: Container(
+                ),
+                const SizedBox(
+                  height: 30.0,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 2,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(0, 3), // changes position of shadow
+                        )
+                      ]),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Material(
+                        // Review
+                        color: Colors.transparent,
+                        child: InkWell(
+                            onTap: _onReviewTapped,
+                            borderRadius: BorderRadius.circular(5.0),
+                            child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5.0, horizontal: 10.0),
                               child: const Text(
-                                "Feedback",
+                                "Review",
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(fontSize: 17.0),
-                              ))))
-                ],
-              ),
+                              ),
+                            )),
+                      ),
+                      const SizedBox(
+                        height: 15.0,
+                      ),
+                      Material(
+                          // Feedback
+                          color: Colors.transparent,
+                          child: InkWell(
+                              onTap: _onFeedbackTapped,
+                              borderRadius: BorderRadius.circular(5.0),
+                              child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: const Text(
+                                    "Feedback",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 17.0),
+                                  ))))
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          )),
     );
   }
 }

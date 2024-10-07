@@ -1,21 +1,33 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+import 'package:lottie/lottie.dart';
+import 'package:weatherwise/helpers/database_helper.dart';
+import 'package:weatherwise/helpers/shared_preferences_helper.dart';
 
-import '../helpers/PermissionHelper.dart';
+import '../helpers/notification_helper.dart';
+import '../helpers/permission_helper.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  final PermissionHelper permissionHelper;
+
+  const SplashScreen({Key? key, required this.permissionHelper})
+      : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver {
+class _SplashScreenState extends State<SplashScreen>
+    with WidgetsBindingObserver {
   StreamSubscription<PermissionStatus>? _permissionStatusSubscription;
   bool _openedAppSettings = false;
+
+  // Instance of notification helper class
+  final NotificationHelper _notificationHelper = NotificationHelper();
 
   @override
   void initState() {
@@ -23,13 +35,14 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
     _checkPermissions();
     // Subscribe to permission status changes
     _permissionStatusSubscription =
-        PermissionHelper().permissionStatusStream.listen((status) {
-          if (status == PermissionStatus.granted) {
-            _navigateToNextScreen();
-          } else if (status == PermissionStatus.denied || status == PermissionStatus.deniedForever) {
-            _handleLocationPermissionDenied();
-          }
-        });
+        widget.permissionHelper.permissionStatusStream.listen((status) {
+      if (status == PermissionStatus.granted) {
+        _navigateToNextScreen();
+      } else if (status == PermissionStatus.denied ||
+          status == PermissionStatus.deniedForever) {
+        _handleLocationPermissionDenied();
+      }
+    });
 
     WidgetsBinding.instance.addObserver(this);
   }
@@ -38,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
   void dispose() {
     // Cancel the permission status subscription
     _permissionStatusSubscription?.cancel();
-    PermissionHelper().dispose();
+    widget.permissionHelper.dispose();
     super.dispose();
   }
 
@@ -52,19 +65,20 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
   }
 
   Future<void> _checkPermissions() async {
-    if (!await PermissionHelper().isLocationPermissionGranted()) {
-      PermissionHelper().requestLocationPermission();
+    if (!await widget.permissionHelper.isLocationPermissionGranted()) {
+      widget.permissionHelper.requestLocationPermission();
     } else {
       _navigateToNextScreen();
     }
   }
 
   void _handleLocationPermissionDenied() async {
-    if (await PermissionHelper().shouldShowLocationRequestRationale()) {
+    if (await widget.permissionHelper.shouldShowLocationRequestRationale()) {
       _showExplanationDialog();
-    } else { // Permission permanently denied
+    } else {
+      // Permission permanently denied
       _openedAppSettings = true;
-      PermissionHelper().openSettings();
+      widget.permissionHelper.openSettings();
     }
   }
 
@@ -91,15 +105,27 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
   }
 
   void _navigateToNextScreen() {
-    // Navigate to the next screen, for example, HomeScreen
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-          builder: (context) => const HomeScreen()),
-    );
+    try {
+      // Navigate to the next screen, for example, HomeScreen
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(
+                  databaseHelper: DatabaseHelper(),
+                  preferences: AppSharedPreferences(),
+                )),
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Initialize notification helper object
+    _notificationHelper.initialize(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
@@ -125,8 +151,11 @@ class _SplashScreenState extends State<SplashScreen> with WidgetsBindingObserver
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Image.asset('assets/images/splash_cloud_img.png',
-                fit: BoxFit.contain),
+            // Image.asset('assets/images/splash_cloud_img.png',
+            //     fit: BoxFit.contain),
+            Lottie.asset("assets/icons/clouds_animation.json",
+                fit: BoxFit.contain,
+                alignment: Alignment.center),
             const Text(
               "WeatherWise",
               style: TextStyle(
