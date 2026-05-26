@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../helpers/permission_helper.dart';
-import '../screens/splash_screen.dart';
+import '../features/splash/presentation/splash_screen.dart';
 
 class WeatherWiseApp extends ConsumerWidget {
   const WeatherWiseApp({super.key});
@@ -16,9 +15,7 @@ class WeatherWiseApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: SafeArea(
-        child: SplashScreen(permissionHelper: PermissionHelper()),
-      ),
+      home: const SafeArea(child: SplashScreen()),
     );
   }
 }
