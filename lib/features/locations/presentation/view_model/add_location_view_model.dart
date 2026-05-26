@@ -1,9 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/error/app_failure.dart';
-import '../../../../core/providers/env_provider.dart';
-import '../../../../network/weather_api_helper.dart';
 import '../../../settings/presentation/view_model/settings_view_model.dart';
+import '../../../weather/presentation/providers/weather_providers.dart';
 import '../../domain/entities/city_suggestion.dart';
 import '../../domain/entities/saved_location.dart';
 import '../providers/locations_providers.dart';
@@ -49,61 +48,68 @@ class AddLocationViewModel
     );
   }
 
-  /// Fetches weather for the picked city, builds a SavedLocation, persists it,
-  /// then triggers a refresh of the manage-locations list.
-  ///
-  /// Step 7 still goes through the legacy WeatherApiHelper to avoid pulling
-  /// the weather feature migration forward; the call site moves to the
-  /// WeatherRepository in step 8.
+  /// Fetches weather for the picked city via the WeatherRepository,
+  /// builds a SavedLocation, persists it, then triggers a refresh of the
+  /// manage-locations list + favorite watcher.
   Future<bool> addCity(CitySuggestion city) async {
     state = const AsyncLoading();
-    try {
-      final settings = ref.read(settingsViewModelProvider).valueOrNull;
-      final units = (settings?.unit.apiQueryValue) ?? 'metric';
-      final apiKey = ref.read(envProvider).openWeatherApiKey;
-      final weather = await WeatherApiHelper(apiKey)
-          .getCurrentWeatherData(city.latitude, city.longitude, units);
-
-      if (weather == null) {
-        state = AsyncError(
-          const ApiFailure(0, message: 'Failed to fetch weather'),
-          StackTrace.current,
-        );
-        return false;
-      }
-
-      final location = SavedLocation(
-        name: weather.name,
-        region: city.adminName,
-        latitude: weather.coord.lat,
-        longitude: weather.coord.lon,
-        isFavorite: false,
-        useDeviceLocation: false,
-        weatherCondition: weather.weather.first.main,
-        weatherIconId: weather.weather.first.icon,
-        currentTemperature: weather.main.temp,
-        minTemperature: weather.main.tempMin,
-        maxTemperature: weather.main.tempMax,
+    final settings = ref.read(settingsViewModelProvider).valueOrNull;
+    final unit = settings?.unit;
+    if (unit == null) {
+      state = AsyncError(
+        const UnknownFailure(),
+        StackTrace.current,
       );
-
-      final saveResult =
-          await ref.read(saveLocationUseCaseProvider)(location);
-      return saveResult.fold(
-        onSuccess: (_) {
-          state = const AsyncData(AddLocationState());
-          ref.invalidate(manageLocationsViewModelProvider);
-          ref.invalidate(favoriteLocationProvider);
-          return true;
-        },
-        onFailure: (f) {
-          state = AsyncError(f, StackTrace.current);
-          return false;
-        },
-      );
-    } catch (e, st) {
-      state = AsyncError(UnknownFailure(cause: e), st);
       return false;
     }
+
+    final weatherResult =
+        await ref.read(getCurrentWeatherUseCaseProvider)(
+      latitude: city.latitude,
+      longitude: city.longitude,
+      unit: unit,
+    );
+
+    final weather = weatherResult.fold(
+      onSuccess: (w) => w,
+      onFailure: (_) => null,
+    );
+
+    if (weather == null) {
+      state = AsyncError(
+        weatherResult.failureOrNull ?? const UnknownFailure(),
+        StackTrace.current,
+      );
+      return false;
+    }
+
+    final location = SavedLocation(
+      name: weather.locationName,
+      region: city.adminName,
+      latitude: weather.latitude,
+      longitude: weather.longitude,
+      isFavorite: false,
+      useDeviceLocation: false,
+      weatherCondition: weather.condition,
+      weatherIconId: weather.iconId,
+      currentTemperature: weather.temperature,
+      minTemperature: weather.tempMin,
+      maxTemperature: weather.tempMax,
+    );
+
+    final saveResult = await ref.read(saveLocationUseCaseProvider)(location);
+    return saveResult.fold(
+      onSuccess: (_) {
+        state = const AsyncData(AddLocationState());
+        ref.invalidate(manageLocationsViewModelProvider);
+        ref.invalidate(favoriteLocationProvider);
+        return true;
+      },
+      onFailure: (f) {
+        state = AsyncError(f, StackTrace.current);
+        return false;
+      },
+    );
   }
 }
 

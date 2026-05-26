@@ -12,7 +12,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:weatherwise/helpers/permission_helper.dart';
 import 'package:weatherwise/helpers/shared_preferences_helper.dart';
 import 'package:weatherwise/main.dart';
-import 'package:weatherwise/screens/home_screen.dart';
+import 'package:weatherwise/features/weather/presentation/home_screen.dart';
 
 import 'splash_screen_test.mocks.dart';
 

@@ -4,12 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
-import 'package:weatherwise/helpers/database_helper.dart';
-import 'package:weatherwise/helpers/shared_preferences_helper.dart';
+import 'package:weatherwise/features/weather/presentation/home_screen.dart';
 
 import '../helpers/notification_helper.dart';
 import '../helpers/permission_helper.dart';
-import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final PermissionHelper permissionHelper;
@@ -108,11 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
     try {
       // Navigate to the next screen, for example, HomeScreen
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-            builder: (context) => HomeScreen(
-                  databaseHelper: DatabaseHelper(),
-                  preferences: AppSharedPreferences(),
-                )),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } catch (e) {
       if (kDebugMode) {
