@@ -3,16 +3,15 @@ import 'dart:async';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router/routes.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/services/connectivity_service.dart';
 import '../../../core/services/geolocator_service.dart';
 import '../../../utils/wcolors.dart';
-import '../../locations/presentation/manage_locations_screen.dart';
 import '../../locations/presentation/view_model/manage_locations_view_model.dart';
-import '../../settings/presentation/settings_screen.dart';
 import '../../settings/presentation/view_model/settings_view_model.dart';
-import '../../support/presentation/report_wrong_location_screen.dart';
 import 'view_model/current_weather_view_model.dart';
 import 'view_model/forecast_view_model.dart';
 import 'view_model/weather_source.dart';
@@ -129,10 +128,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           locationEnabled: locationEnabled,
           onSettings: () async {
             Navigator.pop(context);
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-            );
+            await context.pushNamed(AppRoute.settings.name);
             ref.invalidate(settingsViewModelProvider);
             ref.invalidate(favoriteLocationProvider);
             ref.invalidate(currentWeatherViewModelProvider);
@@ -140,20 +136,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
           onManageLocations: () async {
             Navigator.pop(context);
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ManageLocationsScreen()),
-            );
+            await context.pushNamed(AppRoute.manageLocations.name);
             ref.invalidate(favoriteLocationProvider);
           },
           onReport: () {
             Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ReportWrongLocationScreen(),
-              ),
-            );
+            context.pushNamed(AppRoute.reportWrongLocation.name);
           },
         ),
       ),

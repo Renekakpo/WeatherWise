@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router/routes.dart';
 import '../../../core/services/geolocator_service.dart';
 import '../domain/entities/saved_location.dart';
-import 'add_location_screen.dart';
 import 'view_model/manage_locations_view_model.dart';
 import 'widgets/location_list_item.dart';
 
@@ -73,7 +74,7 @@ class _ManageLocationsScreenState extends ConsumerState<ManageLocationsScreen> {
           ),
           onPressed: _editing
               ? () => _selectAll(asyncLocations.valueOrNull ?? const [])
-              : () => Navigator.pop(context, true),
+              : () => context.pop(),
         ),
         title: Container(
           padding: const EdgeInsets.all(8.0),
@@ -110,10 +111,7 @@ class _ManageLocationsScreenState extends ConsumerState<ManageLocationsScreen> {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () async {
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const AddLocationScreen()),
-                    );
+                    await context.pushNamed(AppRoute.addLocation.name);
                     ref
                         .read(manageLocationsViewModelProvider.notifier)
                         .refresh();
@@ -239,7 +237,7 @@ class _ManageLocationsScreenState extends ConsumerState<ManageLocationsScreen> {
       _selectedIds.clear();
       _editing = false;
     });
-    if (mounted) Navigator.pop(context);
+    if (mounted) Navigator.of(context).pop();
   }
 
   Future<void> _setFavoriteSelected(int? id) async {
@@ -249,7 +247,7 @@ class _ManageLocationsScreenState extends ConsumerState<ManageLocationsScreen> {
       _selectedIds.clear();
       _editing = false;
     });
-    if (mounted) Navigator.pop(context);
+    if (mounted) Navigator.of(context).pop();
   }
 }
 

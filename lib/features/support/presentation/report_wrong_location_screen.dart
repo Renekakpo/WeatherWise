@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/strings.dart';
 import '../domain/entities/support_request.dart';
@@ -18,7 +19,7 @@ class ReportWrongLocationScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFFF8FAFD),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         title: Container(
           padding: const EdgeInsets.all(8.0),

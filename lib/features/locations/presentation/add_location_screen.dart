@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import 'view_model/add_location_view_model.dart';
@@ -32,7 +33,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => loading ? null : Navigator.pop(context),
+          onPressed: () => loading ? null : context.pop(),
         ),
         title: TextField(
           controller: _controller,
@@ -81,7 +82,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                       onTap: () async {
                         final ok = await notifier.addCity(city);
                         if (ok && context.mounted) {
-                          Navigator.pop(context);
+                          context.pop();
                         }
                       },
                     );

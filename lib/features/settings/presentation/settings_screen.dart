@@ -30,7 +30,7 @@ class SettingsScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFFF8FAFD),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.pop(context, true),
+          onPressed: () => Navigator.of(context).pop(true),
         ),
         title: const Text(
           Strings.weatherSettingsTitle,
