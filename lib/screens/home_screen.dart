@@ -10,9 +10,9 @@ import 'package:weatherwise/helpers/location_helper.dart';
 import 'package:weatherwise/helpers/internet_helper.dart';
 import 'package:weatherwise/models/forecast_data.dart';
 import 'package:weatherwise/models/manage_location.dart';
+import 'package:weatherwise/features/locations/presentation/manage_locations_screen.dart';
 import 'package:weatherwise/features/settings/presentation/settings_screen.dart';
 import 'package:weatherwise/features/support/presentation/report_wrong_location_screen.dart';
-import 'package:weatherwise/screens/manage_locations_screen.dart';
 import 'package:weatherwise/screens/weather_screen.dart';
 import 'package:weatherwise/utils/strings.dart';
 
