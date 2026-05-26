@@ -24,8 +24,8 @@ class NotificationHelper {
     const AndroidInitializationSettings initializationSettingsAndroid =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const IOSInitializationSettings initializationSettingsIOS =
-    IOSInitializationSettings();
+    const DarwinInitializationSettings initializationSettingsIOS =
+    DarwinInitializationSettings();
 
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
@@ -83,10 +83,10 @@ class NotificationHelper {
     );
 
     // For iOS, use an attachment for the image
-    final IOSNotificationDetails iOSPlatformChannelSpecifics =
-    IOSNotificationDetails(
+    final DarwinNotificationDetails iOSPlatformChannelSpecifics =
+    DarwinNotificationDetails(
       attachments: [
-        IOSNotificationAttachment(
+        DarwinNotificationAttachment(
           await _saveImageToTempFile(iconData),
         ),
       ],
