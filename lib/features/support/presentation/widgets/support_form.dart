@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/strings.dart';
-import '../../../../widgets/custom_button.dart';
-import '../../../../widgets/custom_input_field.dart';
+import '../../../../shared/widgets/custom_button.dart';
+import '../../../../shared/widgets/custom_input_field.dart';
 
 class SupportForm extends StatefulWidget {
   const SupportForm({

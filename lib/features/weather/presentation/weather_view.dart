@@ -6,7 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/services/notification_service.dart';
 import '../../../core/utils/weather_description.dart';
-import '../../../utils/wcolors.dart';
+import '../../../app/theme/app_colors.dart';
 import '../../settings/presentation/view_model/settings_view_model.dart';
 import '../domain/entities/weather.dart';
 import 'providers/weather_providers.dart';

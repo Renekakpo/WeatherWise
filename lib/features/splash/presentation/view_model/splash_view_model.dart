@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:location/location.dart' show PermissionStatus;
 
 import '../../../../core/services/permission_service.dart';
 
@@ -62,8 +61,8 @@ class SplashViewModel extends AutoDisposeNotifier<SplashState>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
-    if (lifecycle == AppLifecycleState.resumed && _openedSettings) {
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _openedSettings) {
       _openedSettings = false;
       check();
     }

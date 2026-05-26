@@ -2,7 +2,6 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:weatherwise/core/error/app_failure.dart';
-import 'package:weatherwise/core/result/result.dart';
 import 'package:weatherwise/features/support/data/datasources/email_sender_data_source.dart';
 import 'package:weatherwise/features/support/data/repositories/support_repository_impl.dart';
 import 'package:weatherwise/features/support/domain/entities/support_request.dart';

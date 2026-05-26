@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:weatherwise/features/locations/data/datasources/locations_local_data_source.dart';
 import 'package:weatherwise/features/locations/domain/entities/saved_location.dart';

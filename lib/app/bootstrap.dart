@@ -3,20 +3,19 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../helpers/shared_preferences_helper.dart';
-
 class BootstrapResult {
   const BootstrapResult({required this.sharedPreferences});
 
   final SharedPreferences sharedPreferences;
 }
 
+/// Performs every asynchronous startup step the app needs before runApp.
+/// The resolved SharedPreferences instance is handed back so the entry
+/// point can seed sharedPreferencesProvider via a ProviderScope override.
 Future<BootstrapResult> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
-
-  AppSharedPreferences(prefs: prefs);
 
   try {
     await dotenv.load(fileName: '.env');

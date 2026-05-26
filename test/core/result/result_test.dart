@@ -52,8 +52,8 @@ void main() {
       };
       expect(label, 'value=7');
 
-      r = const Failure(CacheFailure());
-      final label2 = switch (r) {
+      const Result<int> r2 = Failure(CacheFailure());
+      final label2 = switch (r2) {
         Success(:final data) => 'value=$data',
         Failure(:final failure) => 'err=${failure.message}',
       };

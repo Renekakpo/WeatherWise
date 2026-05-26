@@ -11,8 +11,6 @@ import 'package:weatherwise/features/settings/presentation/view_model/settings_v
 
 class _MockRepository extends Mock implements SettingsRepository {}
 
-class _Fake extends Fake {}
-
 void main() {
   setUpAll(() {
     registerFallbackValue(const AppSettings.defaults());

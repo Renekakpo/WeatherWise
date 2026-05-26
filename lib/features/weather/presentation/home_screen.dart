@@ -9,7 +9,7 @@ import '../../../app/router/routes.dart';
 import '../../../core/constants/strings.dart';
 import '../../../core/services/connectivity_service.dart';
 import '../../../core/services/geolocator_service.dart';
-import '../../../utils/wcolors.dart';
+import '../../../app/theme/app_colors.dart';
 import '../../locations/presentation/view_model/manage_locations_view_model.dart';
 import '../../settings/presentation/view_model/settings_view_model.dart';
 import 'view_model/current_weather_view_model.dart';
@@ -270,7 +270,7 @@ class _FavoriteHeader extends StatelessWidget {
         ),
         Tooltip(
           margin: const EdgeInsets.symmetric(horizontal: 25.0),
-          height: MediaQuery.of(context).size.width / 4,
+          constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.width / 4),
           message: Strings.favouriteLocationDesc,
           textAlign: TextAlign.start,
           triggerMode: TooltipTriggerMode.tap,

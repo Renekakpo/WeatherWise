@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/strings.dart';
 import '../../../../core/utils/unit_converter.dart';
-import '../../../../utils/wcolors.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../../settings/domain/entities/temperature_unit.dart';
 import '../../domain/entities/weather.dart';
 
@@ -57,7 +57,7 @@ class WeatherDetailsCard extends StatelessWidget {
               _Tile(
                 width: width,
                 asset: 'assets/images/weather_temp.png',
-                header: '${temp}º',
+                header: '$tempº',
                 subHeader: unit.isImperial ? Strings.fahrenheit : Strings.celsius,
                 headerFont: headerFont,
                 subHeaderFont: subHeaderFont,

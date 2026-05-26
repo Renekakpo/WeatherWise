@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/strings.dart';
-import '../../../../widgets/custom_radio_button.dart';
+import '../../../../shared/widgets/custom_radio_button.dart';
 
 class AutoRefreshSheet extends StatelessWidget {
   const AutoRefreshSheet({

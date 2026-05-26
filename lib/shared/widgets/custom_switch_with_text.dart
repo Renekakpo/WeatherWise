@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:weatherwise/utils/wcolors.dart';
+import 'package:weatherwise/app/theme/app_colors.dart';
 
 class CustomSwitchWithText extends StatefulWidget {
   final Function(bool) onUnitChanged;

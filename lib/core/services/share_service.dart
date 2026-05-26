@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 
-/// Thin wrapper over share so feature code never imports a third-party
-/// package directly. Will swap to share_plus in step 11.
+/// Thin wrapper over share_plus so feature code never imports a third-party
+/// package directly.
 class ShareService {
   const ShareService();
 
   Future<void> shareText(String text, {String? subject}) async {
-    Share.share(text, subject: subject);
+    await Share.share(text, subject: subject);
   }
 }
 

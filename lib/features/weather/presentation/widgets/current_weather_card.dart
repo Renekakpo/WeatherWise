@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../utils/wcolors.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/weather.dart';
 
 class CurrentWeatherCard extends StatelessWidget {

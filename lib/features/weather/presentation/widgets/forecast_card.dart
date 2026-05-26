@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../../core/utils/date_formatter.dart';
-import '../../../../utils/wcolors.dart';
+import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/forecast.dart';
 
 class ForecastCard extends StatefulWidget {
