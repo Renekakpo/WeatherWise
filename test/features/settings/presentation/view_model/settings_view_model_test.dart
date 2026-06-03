@@ -20,6 +20,7 @@ void main() {
 
   ProviderContainer makeContainer() {
     return ProviderContainer(
+      retry: (_, __) => null,
       overrides: [
         settingsRepositoryProvider.overrideWithValue(repo),
       ],

@@ -23,7 +23,7 @@ class SplashPermissionPermanentlyDenied extends SplashState {
   const SplashPermissionPermanentlyDenied();
 }
 
-class SplashViewModel extends AutoDisposeNotifier<SplashState>
+class SplashViewModel extends Notifier<SplashState>
     with WidgetsBindingObserver {
   bool _openedSettings = false;
 
@@ -70,6 +70,7 @@ class SplashViewModel extends AutoDisposeNotifier<SplashState>
 }
 
 final splashViewModelProvider =
-    AutoDisposeNotifierProvider<SplashViewModel, SplashState>(
+    NotifierProvider<SplashViewModel, SplashState>(
   SplashViewModel.new,
+  isAutoDispose: true,
 );

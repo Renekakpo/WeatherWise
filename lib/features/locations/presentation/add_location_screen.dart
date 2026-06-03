@@ -26,7 +26,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
     final state = ref.watch(addLocationViewModelProvider);
     final notifier = ref.read(addLocationViewModelProvider.notifier);
     final loading = state.isLoading;
-    final value = state.valueOrNull;
+    final value = state.value;
 
     return Scaffold(
       appBar: AppBar(

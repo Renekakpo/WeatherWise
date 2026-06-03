@@ -15,7 +15,7 @@ class SettingsViewModel extends AsyncNotifier<AppSettings> {
   }
 
   Future<void> setUnit(TemperatureUnit unit) async {
-    final current = state.valueOrNull ?? const AppSettings.defaults();
+    final current = state.value ?? const AppSettings.defaults();
     final previous = state;
     state = AsyncData(current.copyWith(unit: unit));
     final result =
@@ -30,7 +30,7 @@ class SettingsViewModel extends AsyncNotifier<AppSettings> {
   }
 
   Future<void> setAutoRefreshHours(int hours) async {
-    final current = state.valueOrNull ?? const AppSettings.defaults();
+    final current = state.value ?? const AppSettings.defaults();
     final previous = state;
     state = AsyncData(current.copyWith(autoRefreshHours: hours));
     final result =
@@ -45,7 +45,7 @@ class SettingsViewModel extends AsyncNotifier<AppSettings> {
   }
 
   Future<void> setRefreshOnTheGo(bool value) async {
-    final current = state.valueOrNull ?? const AppSettings.defaults();
+    final current = state.value ?? const AppSettings.defaults();
     final previous = state;
     state = AsyncData(current.copyWith(refreshOnTheGo: value));
     final result =

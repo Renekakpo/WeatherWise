@@ -4,7 +4,7 @@ import '../../domain/entities/support_request.dart';
 import '../providers/support_providers.dart';
 
 /// Tracks the lifecycle of submitting a support request.
-class ReportViewModel extends AutoDisposeAsyncNotifier<void> {
+class ReportViewModel extends AsyncNotifier<void> {
   @override
   Future<void> build() async {}
 
@@ -26,6 +26,7 @@ class ReportViewModel extends AutoDisposeAsyncNotifier<void> {
 }
 
 final reportViewModelProvider =
-    AsyncNotifierProvider.autoDispose<ReportViewModel, void>(
+    AsyncNotifierProvider<ReportViewModel, void>(
   ReportViewModel.new,
+  isAutoDispose: true,
 );

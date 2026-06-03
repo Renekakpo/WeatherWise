@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/saved_location.dart';
 import '../providers/locations_providers.dart';
 
-class ManageLocationsViewModel
-    extends AutoDisposeAsyncNotifier<List<SavedLocation>> {
+class ManageLocationsViewModel extends AsyncNotifier<List<SavedLocation>> {
   @override
   Future<List<SavedLocation>> build() async {
     final result = await ref.read(getSavedLocationsUseCaseProvider)();
@@ -58,8 +57,9 @@ class ManageLocationsViewModel
 }
 
 final manageLocationsViewModelProvider =
-    AsyncNotifierProvider.autoDispose<ManageLocationsViewModel, List<SavedLocation>>(
+    AsyncNotifierProvider<ManageLocationsViewModel, List<SavedLocation>>(
   ManageLocationsViewModel.new,
+  isAutoDispose: true,
 );
 
 /// Cross-feature read of the user's favorite location. Watched by the

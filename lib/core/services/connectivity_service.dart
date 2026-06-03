@@ -8,12 +8,12 @@ class ConnectivityService {
   final Connectivity _connectivity;
 
   Future<bool> isInternetAvailable() async {
-    final result = await _connectivity.checkConnectivity();
-    return result == ConnectivityResult.mobile ||
-        result == ConnectivityResult.wifi;
+    final results = await _connectivity.checkConnectivity();
+    return results.contains(ConnectivityResult.mobile) ||
+        results.contains(ConnectivityResult.wifi);
   }
 
-  Stream<ConnectivityResult> get connectivityStream =>
+  Stream<List<ConnectivityResult>> get connectivityStream =>
       _connectivity.onConnectivityChanged;
 }
 
@@ -21,6 +21,7 @@ final connectivityServiceProvider = Provider<ConnectivityService>((_) {
   return ConnectivityService();
 });
 
-final connectivityStreamProvider = StreamProvider<ConnectivityResult>((ref) {
+final connectivityStreamProvider =
+    StreamProvider<List<ConnectivityResult>>((ref) {
   return ref.watch(connectivityServiceProvider).connectivityStream;
 });

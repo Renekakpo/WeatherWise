@@ -31,7 +31,7 @@ class _WeatherViewState extends ConsumerState<WeatherView> {
   Widget build(BuildContext context) {
     final asyncWeather = ref.watch(currentWeatherViewModelProvider);
     final asyncForecast = ref.watch(forecastViewModelProvider);
-    final settings = ref.watch(settingsViewModelProvider).valueOrNull;
+    final settings = ref.watch(settingsViewModelProvider).value;
 
     ref.listen<AsyncValue<Weather>>(currentWeatherViewModelProvider,
         (previous, next) {
@@ -92,7 +92,7 @@ class _WeatherViewState extends ConsumerState<WeatherView> {
       if (kDebugMode) debugPrint('Notification permission denied');
       return;
     }
-    final settings = ref.read(settingsViewModelProvider).valueOrNull;
+    final settings = ref.read(settingsViewModelProvider).value;
     final symbol = (settings?.unit.temperatureSymbol) ?? 'ºC';
     final body = 'Today feels like ${weather.feelsLike.round()}$symbol.\n'
         '${getWeatherDescription(weather.feelsLike)}';

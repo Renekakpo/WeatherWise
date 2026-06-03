@@ -29,8 +29,7 @@ class AddLocationState {
   }
 }
 
-class AddLocationViewModel
-    extends AutoDisposeAsyncNotifier<AddLocationState> {
+class AddLocationViewModel extends AsyncNotifier<AddLocationState> {
   @override
   Future<AddLocationState> build() async => const AddLocationState();
 
@@ -53,7 +52,7 @@ class AddLocationViewModel
   /// manage-locations list + favorite watcher.
   Future<bool> addCity(CitySuggestion city) async {
     state = const AsyncLoading();
-    final settings = ref.read(settingsViewModelProvider).valueOrNull;
+    final settings = ref.read(settingsViewModelProvider).value;
     final unit = settings?.unit;
     if (unit == null) {
       state = AsyncError(
@@ -114,6 +113,7 @@ class AddLocationViewModel
 }
 
 final addLocationViewModelProvider =
-    AsyncNotifierProvider.autoDispose<AddLocationViewModel, AddLocationState>(
+    AsyncNotifierProvider<AddLocationViewModel, AddLocationState>(
   AddLocationViewModel.new,
+  isAutoDispose: true,
 );

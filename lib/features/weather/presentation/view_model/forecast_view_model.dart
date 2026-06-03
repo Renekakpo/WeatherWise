@@ -5,7 +5,7 @@ import '../../domain/entities/forecast.dart';
 import '../providers/weather_providers.dart';
 import 'weather_source.dart';
 
-class ForecastViewModel extends AutoDisposeAsyncNotifier<Forecast> {
+class ForecastViewModel extends AsyncNotifier<Forecast> {
   @override
   Future<Forecast> build() async {
     final source = await ref.watch(weatherSourceProvider.future);
@@ -31,6 +31,7 @@ class ForecastViewModel extends AutoDisposeAsyncNotifier<Forecast> {
 }
 
 final forecastViewModelProvider =
-    AsyncNotifierProvider.autoDispose<ForecastViewModel, Forecast>(
+    AsyncNotifierProvider<ForecastViewModel, Forecast>(
   ForecastViewModel.new,
+  isAutoDispose: true,
 );

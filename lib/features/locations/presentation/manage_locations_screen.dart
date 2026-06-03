@@ -73,7 +73,7 @@ class _ManageLocationsScreenState extends ConsumerState<ManageLocationsScreen> {
                 : Icons.arrow_back_ios_new_rounded,
           ),
           onPressed: _editing
-              ? () => _selectAll(asyncLocations.valueOrNull ?? const [])
+              ? () => _selectAll(asyncLocations.value ?? const [])
               : () => context.pop(),
         ),
         title: Container(
@@ -100,7 +100,7 @@ class _ManageLocationsScreenState extends ConsumerState<ManageLocationsScreen> {
                 IconButton(
                   icon: const Icon(Icons.check_rounded),
                   onPressed: () =>
-                      _showActionSheet(asyncLocations.valueOrNull ?? const []),
+                      _showActionSheet(asyncLocations.value ?? const []),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_outlined),

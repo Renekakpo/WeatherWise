@@ -2,12 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>NSLocalNotificationUsageDescription</key>
-    <string>We need your permission to send weather notifications.</string>
+	<key>NSLocalNotificationUsageDescription</key>
+	<string>We need your permission to send weather notifications.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to show local weather.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need your location to show local weather.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>All time location information</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Allow WeatherWise to connect to the Dart VM service for debugging.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_dartVmService._tcp</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

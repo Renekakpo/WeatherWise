@@ -25,7 +25,7 @@ class NotificationService {
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const ios = DarwinInitializationSettings();
     const settings = InitializationSettings(android: android, iOS: ios);
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
     await _requestPermissions();
     _initialized = true;
   }
@@ -66,10 +66,10 @@ class NotificationService {
     );
 
     await _plugin.show(
-      notificationId,
-      title,
-      body,
-      NotificationDetails(android: android, iOS: ios),
+      id: notificationId,
+      title: title,
+      body: body,
+      notificationDetails: NotificationDetails(android: android, iOS: ios),
     );
   }
 

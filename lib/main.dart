@@ -10,6 +10,9 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
+      // Riverpod 3 auto-retries failed provider builds; the app models load
+      // failures as terminal AsyncError states surfaced to the user, so opt out.
+      retry: (_, __) => null,
       overrides: [
         sharedPreferencesProvider.overrideWithValue(boot.sharedPreferences),
       ],

@@ -92,10 +92,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final settings = ref.watch(settingsViewModelProvider).valueOrNull;
-    final source = ref.watch(weatherSourceProvider).valueOrNull;
-    final favorite = ref.watch(favoriteLocationProvider).valueOrNull;
-    final weather = ref.watch(currentWeatherViewModelProvider).valueOrNull;
+    final settings = ref.watch(settingsViewModelProvider).value;
+    final source = ref.watch(weatherSourceProvider).value;
+    final favorite = ref.watch(favoriteLocationProvider).value;
+    final weather = ref.watch(currentWeatherViewModelProvider).value;
 
     if (settings != null) {
       _maybeScheduleAutoRefresh(settings.autoRefreshHours);
