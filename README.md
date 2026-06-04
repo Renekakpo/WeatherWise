@@ -49,6 +49,24 @@ To run WeatherWise on your local machine, follow these steps:
    flutter run
    ```
 
+## Architecture
+
+WeatherWise follows a **Clean Architecture, feature-first** layout with
+**Riverpod** for state management and dependency injection,
+**go_router** for typed navigation, and a sealed `Result<T>` /
+`AppFailure` error vocabulary. Each feature is autonomous and
+structured as `data/` + `domain/` + `presentation/`.
+
+Documentation:
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — layered diagram,
+  dependency rule, top-level layout, feature template.
+- [docs/RIVERPOD.md](docs/RIVERPOD.md) — provider conventions,
+  AsyncNotifier patterns, cross-feature invalidation, anti-patterns.
+- [docs/CLEAN_ARCHITECTURE.md](docs/CLEAN_ARCHITECTURE.md) — why three
+  layers, why use cases, why `Result<T>` instead of exceptions.
+- [docs/TESTING.md](docs/TESTING.md) — mocktail conventions,
+  ProviderContainer setup, sqflite in-memory testing, widget tests.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to open issues or submit pull requests for any new features, bug fixes, or enhancements you'd like to see in WeatherWise.
